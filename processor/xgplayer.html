@@ -1,0 +1,33 @@
+<!--
+SPDX-FileCopyrightText: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0 License
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui">
+    <meta name="referrer" content="no-referrer">
+    <title>xgplayer</title>
+    <style type="text/css">
+      html, body {width:100%;height:100%;margin:auto;overflow: hidden;}
+    </style>
+  </head>
+  <body>
+    <div id="mse"></div>
+    <script src="//cdn.jsdelivr.net/npm/xgplayer@1.1.4/browser/index.js" charset="utf-8"></script>
+      <script src="//cdn.jsdelivr.net/npm/xgplayer-flv.js/browser/index.js" charset="utf-8"></script><script>
+      let player = new FlvJsPlayer({
+		"id": "mse",
+		"playsinline": true,
+		"whitelist": [
+				""
+		],
+		"url": "/4b0f34be-74cd-4d0a-96cb-dd0346445bdd/live.flv"
+      });
+      
+          </script>
+  </body>
+</html>

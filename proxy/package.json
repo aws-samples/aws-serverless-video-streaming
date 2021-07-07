@@ -1,0 +1,23 @@
+// SPDX-FileCopyrightText: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+// SPDX-License-Identifier: MIT-0 License
+{
+  "name": "live-streaming-proxy",
+  "version": "1.0.9",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-config": "node index.js",
+    "get-login": "aws ecr get-login --registry-ids $ACCOUNT_ID --no-include-email --profile bluefin",
+    "build": "docker build -t video-streaming-proxy .",
+    "tag": "docker tag video-streaming-proxy $ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/video-streaming-proxy:latest",
+    "push": "docker push $ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/video-streaming-proxy:latest",
+    "deploy": "yarn run build && yarn run tag && yarn run push"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.853.0",
+    "ejs": "^3.1.6",
+    "lodash": "^4.17.21"
+  }
+}

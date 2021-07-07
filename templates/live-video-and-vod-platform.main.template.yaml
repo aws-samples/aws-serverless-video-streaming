@@ -1,0 +1,270 @@
+# SPDX-FileCopyrightText: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# SPDX-License-Identifier: MIT-0 License
+
+Description: "(SO8015) - Contruct full functional live video and VOD platform with cloud native services in AWS. Version v1.0.0"
+
+Parameters:
+  UserName:
+    Type: String
+    Description: Console user name.
+  UserPassword:
+    Type: String
+    Description: Console user password. Strict password policy is recommended.
+    NoEcho: True
+  CNAME:
+    Type: String
+    Default: www.example.cn
+    Description: Alternate Domain Names for CloudFront
+  AvailabilityZones:
+    Description: 'List of Availability Zones to use for the subnets in the VPC. Note:
+      The logical order is preserved.'
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+  VpcCIDR:
+    Type: String
+    Default: 192.168.0.0/16
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    AllowedPattern: "(?:^$|(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2}))"
+    ConstraintDescription: "must be a valid IP CIDR range of the form x.x.x.x/x."
+    MinLength: 9
+    MaxLength: 18
+  PublicSubnet1CIDR:
+    Type: String
+    Default: 192.168.10.0/24
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    AllowedPattern: "(?:^$|(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2}))"
+    ConstraintDescription: "must be a valid IP CIDR range of the form x.x.x.x/x."
+    MinLength: 9
+    MaxLength: 18
+  PublicSubnet2CIDR:
+    Type: String
+    Default: 192.168.11.0/24
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+    AllowedPattern: "(?:^$|(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2}))"
+    ConstraintDescription: "must be a valid IP CIDR range of the form x.x.x.x/x."
+  PrivateSubnet1CIDR:
+    Type: String
+    Default: 192.168.20.0/24
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    AllowedPattern: "(?:^$|(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2}))"
+    ConstraintDescription: "must be a valid IP CIDR range of the form x.x.x.x/x."
+  PrivateSubnet2CIDR:
+    Type: String
+    Default: 192.168.21.0/24
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    AllowedPattern: "(?:^$|(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2}))"
+    ConstraintDescription: "must be a valid IP CIDR range of the form x.x.x.x/x."
+  QSRegion:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start Region include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Default: aws-cn-quickstart
+    Description: Region for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Account Configuration, set account info"
+        Parameters:
+          - UserName
+          - UserPassword
+          - CNAME
+      - Label:
+          default: "Network Configuration, create new VPC for AWS ECS Fargate"
+        Parameters:
+          - AvailabilityZones
+          - VpcCIDR
+          - PublicSubnet1CIDR
+          - PublicSubnet2CIDR
+          - PrivateSubnet1CIDR
+          - PrivateSubnet2CIDR
+    ParameterLabels:
+      UserName:
+        default: "Initial Console User Name"
+      UserPassword:
+        default: "Initial Console User Password"
+      CNAME:
+        default: "Initial Alias for CloudFront"
+      AvailabilityZones:
+        default: "Availability Zones"
+      VpcCIDR:
+        default: "AWS ECS Fargate VPC CIDR Block"
+      PublicSubnet1CIDR:
+        default: "Public Subnet for the first Availability Zone"
+      PublicSubnet2CIDR:
+        default: "Public Subnet for the second Availability Zone"
+      PrivateSubnet1CIDR:
+        default: "Private Subnet for the first Availability Zone"
+      PrivateSubnet2CIDR:
+        default: "Private Subnet for the second Availability Zone"
+
+Resources:
+  Vpc:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/aws-vpc.template.yaml
+      Parameters:
+        AvailabilityZones: !Join
+          - ','
+          - !Ref 'AvailabilityZones'
+        PublicSubnet1CIDR: !Ref 'PublicSubnet1CIDR'
+        PublicSubnet2CIDR: !Ref 'PublicSubnet2CIDR'
+        PrivateSubnet1ACIDR: !Ref 'PrivateSubnet1CIDR'
+        PrivateSubnet2ACIDR: !Ref 'PrivateSubnet2CIDR'
+        VPCCIDR: !Ref VpcCIDR
+        NumberOfAZs: 2
+
+  Assets:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/assets.template
+
+  DynamoDB:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/dynamodb.template
+
+  SecurityGroup:
+    DependsOn: Vpc
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/security-group.template
+      Parameters:
+        VpcID:
+          Fn::GetAtt: [Vpc, Outputs.VPCID]
+
+  EFS:
+    DependsOn: SecurityGroup
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/efs.template
+      Parameters:
+        PublicSubnet1ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet1ID]
+        PublicSubnet2ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet2ID]
+        VpcID:
+          Fn::GetAtt: [Vpc, Outputs.VPCID]
+
+  Redis:
+    DependsOn: SecurityGroup
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/redis.template
+      Parameters:
+        PublicSubnet1ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet1ID]
+        PublicSubnet2ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet2ID]
+        VpcID:
+          Fn::GetAtt: [Vpc, Outputs.VPCID]
+
+  ECS:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/ecs.template
+
+  Proxy:
+    DependsOn: 
+    - SecurityGroup
+    - ECS
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/proxy.template
+      Parameters:
+        PublicSubnet1ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet1ID]
+        PublicSubnet2ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet2ID]
+        VpcID:
+          Fn::GetAtt: [Vpc, Outputs.VPCID]
+        QSRegion: !Ref QSRegion
+
+  MediaServer:
+    DependsOn: 
+    - Assets
+    - ECS
+    - Redis
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/media-server.template
+      Parameters:
+        PublicSubnet1ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet1ID]
+        PublicSubnet2ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet2ID]
+        VpcID:
+          Fn::GetAtt: [Vpc, Outputs.VPCID]
+        QSRegion: !Ref QSRegion
+
+  MediaProcessor:
+    DependsOn: 
+    - EFS
+    - ECS
+    - Redis
+    - Assets
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/media-processor.template
+      Parameters:
+        PublicSubnet1ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet1ID]
+        PublicSubnet2ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet2ID]
+        VpcID:
+          Fn::GetAtt: [Vpc, Outputs.VPCID]
+        QSRegion: !Ref QSRegion
+
+  Origin:
+    DependsOn:
+    - ECS
+    - Redis
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/origin.template
+      Parameters:
+        PublicSubnet1ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet1ID]
+        PublicSubnet2ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet2ID]
+        VpcID:
+          Fn::GetAtt: [Vpc, Outputs.VPCID]
+        CNAME: !Ref CNAME
+        QSRegion: !Ref QSRegion
+
+  Web:
+    DependsOn:
+    - SecurityGroup
+    - ECS
+    - Origin
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/web.template
+      Parameters:
+        PublicSubnet1ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet1ID]
+        PublicSubnet2ID:
+          Fn::GetAtt: [Vpc, Outputs.PublicSubnet2ID]
+        VpcID:
+          Fn::GetAtt: [Vpc, Outputs.VPCID]
+        QSRegion: !Ref QSRegion
+
+  ## live video & VOD platform console url
+Outputs:
+  LiveVideoPushStreamURL:
+    Description: Live Video Push Stream URL
+    Value: !GetAtt [MediaServer, Outputs.ServerLoadBalancerURL]
+  LiveVideoPullStreamURL:
+    Description: Live Video Pull Stream URL
+    Value: !GetAtt [Origin, Outputs.CloudFrontDomain]
+  LiveVideoPullStreamAlias:
+    Description: Live Video Pull Stream URL Alias
+    Value: !GetAtt [Origin, Outputs.OriginLoadBalancerAlias]
+  LiveVideoConsoleURL:
+    Description: Live Video Management Console Address
+    Value: !GetAtt [Web, Outputs.WebLoadBalancerURL]

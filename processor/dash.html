@@ -1,0 +1,31 @@
+<!--
+SPDX-FileCopyrightText: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0 License
+-->
+
+<head>
+    <title>Clappr Player</title>
+    <meta charset="UTF-8">
+    <!-- Player -->
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+    <!-- DASH  -->
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/dash-shaka-playback@2.2.1/dist/dash-shaka-playback.min.js"></script>
+  </head>
+  
+  <body>
+    <div id="player"></div>
+    <script>
+    //  Clappr.Log.setLevel(Clappr.Log.LEVEL_DEBUG);
+      var player = new Clappr.Player({
+        source: "./manifest.mpd",
+        parentId: "#player",
+        mute: true,
+        autoPlay: true,
+        plugins: {
+         playback:[DashShakaPlayback]
+       },
+      });
+    </script>
+  </body>
+  

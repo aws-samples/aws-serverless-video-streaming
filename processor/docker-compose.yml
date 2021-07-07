@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# SPDX-License-Identifier: MIT-0 License
+
+version: '2'
+services:
+  live-streaming-server:
+    build:
+      context: .
+    volumes:
+      - ./media:/usr/src/app/media
+    ports:
+      - 8001:8000
+      - 1936:1935
+    environment:
+      FFMPEG_PATH: /usr/local/bin/ffmpeg
+      ASSETS_BUCKET: video-streaming-assets-assetsbucket-b7h0zjs5w8ry
+      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      CACHE_DOMAIN: redis
+      NODE_ENV: development
+    links:
+      - redis
+  redis:
+    image: redis
+    container_name: cache
+    expose:
+      - 6379

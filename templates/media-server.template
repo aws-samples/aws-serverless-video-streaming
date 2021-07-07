@@ -1,0 +1,233 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Live Streaming Server
+
+Parameters:
+  VpcID:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC Id
+  PublicSubnet1ID:
+    Type: AWS::EC2::Subnet::Id
+    Description: Public Subnet Id for the first Availability Zone
+  PublicSubnet2ID:
+    Type: AWS::EC2::Subnet::Id
+    Description: Public Subnet Id for the second Availability Zone
+  DesiredCount:
+    Type: Number
+    Default: '1'
+    Description: Desired task count
+  RtmpPort:
+    Type: String
+    Description: Rtmp Port
+    Default: 1935
+  HttpPort:
+    Type: String
+    Description: Http Port
+    Default: 8000
+  QSRegion:
+    Description: Region for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
+
+Conditions:
+  UsingDefaultRegion: !Equals [!Ref QSRegion, 'aws-cn-quickstart']
+
+Resources:
+  CloudWatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref AWS::StackName
+
+  # Task Role
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ecs-task-${AWS::StackName}-${AWS::Region}
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+            Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ecs-service-${AWS::StackName}-${AWS::Region}
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - '*'
+                Resource:
+                  - '*'
+
+  # A role needed by ECS
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ecs-execution-${AWS::StackName}-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub
+          - 'arn:${Region}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+          - Region: !If [ UsingDefaultRegion, 'aws-cn', 'aws' ]
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: 'video-streaming-server'
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: !GetAtt ExecutionRole.Arn
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      # 256 (.25 vCPU) - Available memory values: 0.5GB, 1GB, 2GB
+      # 512 (.5 vCPU) - Available memory values: 1GB, 2GB, 3GB, 4GB
+      # 1024 (1 vCPU) - Available memory values: 2GB, 3GB, 4GB, 5GB, 6GB, 7GB, 8GB
+      # 2048 (2 vCPU) - Available memory values: Between 4GB and 16GB in 1GB increments
+      # 4096 (4 vCPU) - Available memory values: Between 8GB and 30GB in 1GB increments
+      Cpu: '2048'
+      # 0.5GB, 1GB, 2GB - Available cpu values: 256 (.25 vCPU)
+      # 1GB, 2GB, 3GB, 4GB - Available cpu values: 512 (.5 vCPU)
+      # 2GB, 3GB, 4GB, 5GB, 6GB, 7GB, 8GB - Available cpu values: 1024 (1 vCPU)
+      # Between 4GB and 16GB in 1GB increments - Available cpu values: 2048 (2 vCPU)
+      # Between 8GB and 30GB in 1GB increments - Available cpu values: 4096 (4 vCPU)
+      Memory: 4GB
+      ContainerDefinitions:
+        - Name: 'video-streaming-server'
+          Image: "public.ecr.aws/l6z1v6o9/video-streaming-server"
+          PortMappings:
+            - ContainerPort: !Ref RtmpPort
+              Protocol: tcp
+            - ContainerPort: !Ref HttpPort
+              Protocol: tcp
+          Environment:
+            - Name: AWS_REGION
+              Value: !Ref AWS::Region
+            - Name: ENV
+              Value: 'production'
+            - Name: NODE_ENV
+              Value: 'production'
+            - Name: AWS_ACCOUNT_ID
+              Value: !Ref AWS::AccountId
+            - Name: ASSETS_BUCKET
+              Value:
+                Fn::ImportValue: 'Assets-AssetsBucket'
+            - Name: CACHE_DOMAIN
+              Value:
+                Fn::ImportValue: 'Redis-RedisCluster'
+            - Name: MEDIA_ROOT
+              Value: '/usr/src/app/media'
+            - Name: ECS_TYPE
+              Value: 'fargate'
+            - Name: ECS_CLUSTER_NAME
+              Value: 'video-streaming'
+            - Name: ECS_TASK_NAME
+              Value: 'video-streaming-processor'
+            - Name: ECS_CONTAINER_NAME
+              Value: 'video-streaming-processor'
+            - Name: SUBNET_ID1
+              Value: !Ref PublicSubnet1ID
+            - Name: SUBNET_ID2
+              Value: !Ref PublicSubnet2ID
+            - Name: SECURITY_GROUP
+              Value:
+                Fn::ImportValue: 'SecurityGroup-ServerContainerSecurityGroup'
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref AWS::StackName
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+
+  # Load Balancers
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: 'MediaServer-LoadBalancer'
+      Subnets: 
+        - !Ref PublicSubnet1ID
+        - !Ref PublicSubnet2ID
+      # SecurityGroups:
+      #   - Fn::ImportValue:
+      #       !Sub '${SecurityStack}-ServerLoadBalancerSecurityGroup'
+      Type: network
+
+  ServerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: LoadBalancer
+    Properties:
+      Name: 'MediaServer-TargetGroup'
+      VpcId: !Ref VpcID
+      Port: 1935
+      Protocol: TCP
+      TargetType: ip
+      HealthCheckPath: '/api/server'
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: '8000'
+
+  LoadBalancerListenerTcp:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - LoadBalancer
+      - ServerTargetGroup
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 1935
+      Protocol: 'TCP'
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ServerTargetGroup
+
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn: 
+      - LoadBalancer
+      - ServerTargetGroup
+      - LoadBalancerListenerTcp
+    Properties:
+      ServiceName: 'video-streaming-server'
+      Cluster:
+        Fn::ImportValue: 'ECS-ECSCluster'
+      DesiredCount: !Ref DesiredCount
+      HealthCheckGracePeriodSeconds: 8000000
+      TaskDefinition: !Ref TaskDefinition
+      LaunchType: FARGATE
+      PlatformVersion: 1.4.0
+      NetworkConfiguration: 
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref PublicSubnet1ID
+            - !Ref PublicSubnet2ID
+          SecurityGroups:
+            - Fn::ImportValue: 'SecurityGroup-ServerContainerSecurityGroup'
+      LoadBalancers:
+        - ContainerName: 'video-streaming-server'
+          ContainerPort: 1935
+          TargetGroupArn: !Ref ServerTargetGroup
+
+Outputs:
+  Service:
+    Value: !Ref 'Service'
+    Export:
+      Name: !Sub '${AWS::StackName}-Service'
+  TaskDefinition:
+    Value: !Ref 'TaskDefinition'
+    Export:
+      Name: !Sub '${AWS::StackName}-TaskDefinition'
+  CloudWatchLogsGroup:
+    Value: !Ref 'CloudWatchLogsGroup'
+    Export:
+      Name: !Sub '${AWS::StackName}-CloudWatchLogsGroup'
+  ServerLoadBalancerURL:
+    Value: !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: !Sub '${AWS::StackName}-ServerLoadBalancerURL'

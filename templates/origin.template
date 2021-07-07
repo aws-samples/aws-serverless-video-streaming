@@ -1,0 +1,301 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Live Streaming Origin
+
+Parameters:
+  VpcID:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC Id
+  PublicSubnet1ID:
+    Type: AWS::EC2::Subnet::Id
+    Description: Public Subnet Id for the first Availability Zone
+  PublicSubnet2ID:
+    Type: AWS::EC2::Subnet::Id
+    Description: Public Subnet Id for the second Availability Zone
+  OriginContainerPort:
+    Type: String
+    Description: Origin Container Port
+    Default: 80
+  CNAME:
+    Type: String
+    Description: Initial Alias for CloudFront
+  DesiredCount:
+    Type: Number
+    Default: '1'
+    Description: Desired task count
+  TLD:
+    Type: String
+    Default: finbits.io
+  Domain:
+    Type: String
+    Default: live.finbits.io
+  QSRegion:
+    Description: Region for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
+
+Conditions:
+  UsingDefaultRegion: !Equals [!Ref QSRegion, 'aws-cn-quickstart']
+
+Resources:
+
+  CloudWatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref AWS::StackName
+
+  # Task Role
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ecs-task-${AWS::StackName}-${AWS::Region}
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+            Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub ecs-service-${AWS::StackName}-${AWS::Region}
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - '*'
+                Resource:
+                  - '*'
+
+  # A role needed by ECS
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ecs-execution-${AWS::StackName}-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub
+          - 'arn:${Region}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+          - Region: !If [ UsingDefaultRegion, 'aws-cn', 'aws' ]
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: 'video-streaming-origin'
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: !GetAtt ExecutionRole.Arn
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      # 256 (.25 vCPU) - Available memory values: 0.5GB, 1GB, 2GB
+      # 512 (.5 vCPU) - Available memory values: 1GB, 2GB, 3GB, 4GB
+      # 1024 (1 vCPU) - Available memory values: 2GB, 3GB, 4GB, 5GB, 6GB, 7GB, 8GB
+      # 2048 (2 vCPU) - Available memory values: Between 4GB and 16GB in 1GB increments
+      # 4096 (4 vCPU) - Available memory values: Between 8GB and 30GB in 1GB increments
+      Cpu: '256'
+      # 0.5GB, 1GB, 2GB - Available cpu values: 256 (.25 vCPU)
+      # 1GB, 2GB, 3GB, 4GB - Available cpu values: 512 (.5 vCPU)
+      # 2GB, 3GB, 4GB, 5GB, 6GB, 7GB, 8GB - Available cpu values: 1024 (1 vCPU)
+      # Between 4GB and 16GB in 1GB increments - Available cpu values: 2048 (2 vCPU)
+      # Between 8GB and 30GB in 1GB increments - Available cpu values: 4096 (4 vCPU)
+      Memory: 0.5GB
+      ContainerDefinitions:
+        - Name: 'video-streaming-origin'
+          Image: "public.ecr.aws/l6z1v6o9/video-streaming-origin"
+          PortMappings:
+            - ContainerPort: !Ref OriginContainerPort
+          Environment:
+            - Name: AWS_REGION
+              Value: !Ref AWS::Region
+            - Name: ENV
+              Value: 'production'
+            - Name: NODE_ENV
+              Value: 'production'
+            - Name: AWS_ACCOUNT_ID
+              Value: !Ref AWS::AccountId
+            - Name: CACHE_DOMAIN
+              Value: 
+                Fn::ImportValue: 'Redis-RedisCluster'
+  # Load Balancers
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: 'Origin-LoadBalancer'
+      Subnets:
+        - !Ref PublicSubnet1ID
+        - !Ref PublicSubnet2ID
+      SecurityGroups:
+        - Fn::ImportValue: 'SecurityGroup-OriginLoadBalancerSecurityGroup'
+
+  OriginTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: LoadBalancer
+    Properties:
+      Name: 'Origin-TargetGroup'
+      VpcId: !Ref VpcID
+      Port: !Ref OriginContainerPort
+      Protocol: HTTP
+      Matcher:
+        HttpCode: 200-299
+      TargetType: ip
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: '/healthcheck'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 10
+
+  LoadBalancerListenerHttp:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn:
+      - LoadBalancer
+      - OriginTargetGroup
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: !Ref OriginContainerPort
+      Protocol: 'HTTP'
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref OriginTargetGroup
+
+  # LoadBalancerListenerHttps:
+  #   Type: AWS::ElasticLoadBalancingV2::Listener
+  #   DependsOn:
+  #     - LoadBalancer
+  #     - OriginTargetGroup
+  #   Properties:
+  #     LoadBalancerArn: !Ref LoadBalancer
+  #     Port: 443
+  #     Protocol: 'HTTPS'
+  #     Certificates:
+  #       - CertificateArn: !Ref SSLArn
+  #     DefaultActions:
+  #       - Type: forward
+  #         TargetGroupArn: !Ref OriginTargetGroup
+
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn: 
+      - LoadBalancer
+      - OriginTargetGroup
+      - LoadBalancerListenerHttp
+      # - LoadBalancerListenerHttps
+    Properties:
+      ServiceName: 'video-streaming-origin'
+      Cluster:
+        Fn::ImportValue: 'ECS-ECSCluster'
+      DesiredCount: !Ref DesiredCount
+      TaskDefinition: !Ref TaskDefinition
+      LaunchType: FARGATE
+      PlatformVersion: 1.4.0
+      NetworkConfiguration: 
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref PublicSubnet1ID
+            - !Ref PublicSubnet2ID
+          SecurityGroups:
+            - Fn::ImportValue: 'SecurityGroup-OriginContainerSecurityGroup'
+      HealthCheckGracePeriodSeconds: 30
+      LoadBalancers:
+        - ContainerName: 'video-streaming-origin'
+          ContainerPort: !Ref OriginContainerPort
+          TargetGroupArn: !Ref OriginTargetGroup
+
+  # CloudFront
+  CDN:
+    Type: 'AWS::CloudFront::Distribution'
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Ref CNAME
+        Enabled: true
+        PriceClass: 'PriceClass_All'
+        HttpVersion: 'http2'
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 404
+        Origins:
+          - DomainName: !GetAtt LoadBalancer.DNSName
+            Id: LB
+            CustomOriginConfig:
+              OriginProtocolPolicy: match-viewer
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - HEAD
+            - GET
+            - OPTIONS
+          CachedMethods:
+            - HEAD
+            - GET
+            - OPTIONS
+          TargetOriginId: LB
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+            Headers:
+              - 'Origin'
+              - 'Access-Control-Request-Headers'
+              - 'Access-Control-Request-Method'
+              - 'Host'
+          ViewerProtocolPolicy: "allow-all"
+          MinTTL: 0
+          DefaultTTL: 86400
+          MaxTTL: 31536000
+        Restrictions:
+          GeoRestriction:
+            RestrictionType: none
+        # ViewerCertificate:
+        #   SslSupportMethod: sni-only
+        #   MinimumProtocolVersion: TLSv1
+        #   AcmCertificateArn: !Ref SSLArn
+
+#   #
+#   # Route53 DNS record set to map our domain to our CDN
+#   #
+#   DomainDNS:
+#     Type: AWS::Route53::RecordSetGroup
+#     Properties:
+#       HostedZoneName: !Sub '${TLD}.'
+#       RecordSets:
+#         - Name: !Ref Domain
+#           Type: 'A'
+#           AliasTarget:
+#             HostedZoneId: 'Z2FDTNDATAQYW2' # http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html#cfn-route53-aliastarget-hostedzoneid
+#             DNSName: !GetAtt CDN.DomainName
+
+Outputs:
+  Service:
+    Value: !Ref 'Service'
+    Export:
+      Name: !Sub '${AWS::StackName}-Service'
+  TaskDefinition:
+    Value: !Ref 'TaskDefinition'
+    Export:
+      Name: !Sub '${AWS::StackName}-TaskDefinition'
+  CloudWatchLogsGroup:
+    Value: !Ref 'CloudWatchLogsGroup'
+    Export:
+      Name: !Sub '${AWS::StackName}-CloudWatchLogsGroup'
+  CloudFrontDomain:
+    Value: !GetAtt CDN.DomainName
+    Export:
+      Name: !Sub '${AWS::StackName}-CloudFrontDomain'
+  OriginLoadBalancerURL:
+    Value: !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: !Sub '${AWS::StackName}-OriginLoadBalancerURL'
+  OriginLoadBalancerAlias:
+    # Not currently supported by AWS CloudFormation
+    # Value: !GetAtt LoadBalancer.DistributionConfig.CNAMEs
+    Value: !Ref CNAME
+    Export:
+      Name: !Sub '${AWS::StackName}-OriginLoadBalancerAlias'

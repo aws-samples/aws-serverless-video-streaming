@@ -1,0 +1,32 @@
+global
+ pidfile /var/run/haproxy.pid
+ maxconn <%= servers.length*100 %>
+
+defaults
+ log global
+ timeout connect 10s
+ timeout client 30s
+ timeout server 30s
+
+frontend ft_rtpm
+ bind *:1935 name rtmp
+ mode tcp
+ maxconn <%= servers.length*100 %>
+ default_backend bk_rtmp
+
+frontend ft_http
+ bind *:8000 name http
+ mode http
+ maxconn 600
+ default_backend bk_http
+
+backend bk_http
+ mode http
+ errorfile 503 /usr/local/etc/haproxy/healthcheck.http
+
+backend bk_rtmp 
+ mode tcp
+ balance roundrobin
+ <% servers.forEach(function(server, index) { %>
+ server media<%= index %> <%= server %>:1935 check maxconn 1 weight 10
+ <% }); %>

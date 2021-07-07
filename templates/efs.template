@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: EFS Volume
+
+Parameters:
+  VpcID:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC Id
+  PublicSubnet1ID:
+    Type: AWS::EC2::Subnet::Id
+    Description: Public Subnet Id for the first Availability Zone
+  PublicSubnet2ID:
+    Type: AWS::EC2::Subnet::Id
+    Description: Public Subnet Id for the second Availability Zone
+
+Resources:
+  EFSFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      FileSystemTags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+
+  EFSMountTarget1:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PublicSubnet1ID
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  EFSMountTarget2:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: !Ref PublicSubnet2ID
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  EFSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allowing access to EFS
+      VpcId: !Ref VpcID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId:
+            Fn::ImportValue: 'SecurityGroup-ServerContainerSecurityGroup'
+            # TBD
+            # Fn::ImportValue:
+            #   !Sub 'video-streaming-security-ServerContainerSecurityGroup'
+
+Outputs:
+  EFS:
+    Description: The created EFS 
+    Value: !Ref EFSFileSystem
+    Export:
+      Name: 'EFSStack-EFS'
+
+  EFSMountTarget1:
+    Description: The EFS MountTarget
+    Value: !Ref EFSMountTarget1
+
+  EFSMountTarget2:
+    Description: The EFS MountTarget
+    Value: !Ref EFSMountTarget2
+

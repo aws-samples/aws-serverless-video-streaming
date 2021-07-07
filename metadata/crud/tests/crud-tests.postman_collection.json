@@ -1,0 +1,100 @@
+{
+	"info": {
+		"_postman_id": "f392f17e-3077-460d-bc33-494a2f9265e4",
+		"name": "crud-tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "https://5l5p15hcec.execute-api.eu-west-2.amazonaws.com/Stage/vehicles/3ab6f286-3108-490a-8fe9-11b8f2819549",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Price\": 12991,\r\n    \"Manufacture\": \"Civic\",\r\n    \"Model\": \"Honda\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://5l5p15hcec.execute-api.eu-west-2.amazonaws.com/Stage/vehicles/3ab6f286-3108-490a-8fe9-11b8f2819549",
+					"protocol": "https",
+					"host": [
+						"5l5p15hcec",
+						"execute-api",
+						"eu-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"Stage",
+						"vehicles",
+						"3ab6f286-3108-490a-8fe9-11b8f2819549"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://5l5p15hcec.execute-api.eu-west-2.amazonaws.com/Stage/vehicles/23e49a2d-b6f3-48d6-8bf4-c515b8c4214a",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://5l5p15hcec.execute-api.eu-west-2.amazonaws.com/Stage/vehicles/23e49a2d-b6f3-48d6-8bf4-c515b8c4214a",
+					"protocol": "https",
+					"host": [
+						"5l5p15hcec",
+						"execute-api",
+						"eu-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"Stage",
+						"vehicles",
+						"23e49a2d-b6f3-48d6-8bf4-c515b8c4214a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://5l5p15hcec.execute-api.eu-west-2.amazonaws.com/Stage/vehicles/23e49a2d-b6f3-48d6-8bf4-c515b8c4214a",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Price\": 1299,\r\n    \"Manufacture\": \"Civic\",\r\n    \"Model\": \"Honda\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://5l5p15hcec.execute-api.eu-west-2.amazonaws.com/Stage/vehicles/23e49a2d-b6f3-48d6-8bf4-c515b8c4214a",
+					"protocol": "https",
+					"host": [
+						"5l5p15hcec",
+						"execute-api",
+						"eu-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"Stage",
+						"vehicles",
+						"23e49a2d-b6f3-48d6-8bf4-c515b8c4214a"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

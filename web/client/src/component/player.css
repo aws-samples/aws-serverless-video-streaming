@@ -1,0 +1,16 @@
+/*
+ * SPDX-FileCopyrightText: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT-0 License
+ */
+
+.player-wrapper {
+    position: relative;
+    top: 10;
+    left: 10;
+  }
+  
+  .react-player {
+    position: absolute;
+
+  }

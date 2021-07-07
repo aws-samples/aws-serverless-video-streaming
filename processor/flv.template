@@ -1,0 +1,44 @@
+<head>
+  <title>Clappr Player</title>
+  <meta charset="UTF-8">
+  <!-- Player -->
+  <script type="text/javascript" src="//cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <!-- Quality selector -->
+  <script type="text/javascript" src="//cdn.jsdelivr.net/npm/flv.js@latest/dist/flv.min.js"></script>
+  <script type="text/javascript" src="//cdn.jsdelivr.net/npm/clappr-flvjs-playback@latest/dist/clappr-flvjs-playback.min.js"></script>
+  <style type="text/css">
+    .divVideo{
+        position:relative;
+        width:100%;
+        padding-bottom:40%; 
+    }
+    video{
+        position:absolute;
+        left:1%;
+        top:0;
+        width:50%; 
+        object-fit: fill;
+    }
+    
+      </style>
+</head>
+
+<body>
+  <div id="player"></div>
+  <script>
+    var player = new Clappr.Player({
+      source: "/<%= channel%>/live.flv",
+      parentId: "#player",
+      mute: false,
+      mimeType: 'video/flv',
+      autoPlay: true,
+      plugins: [ FLVJSPlayback ],
+    //   playback: {
+    //     flvjsConfig: {
+    //       enableLogging: true, // default is "false"
+    //       // Params from flv.js
+    //     }
+    //   },
+    });
+  </script>
+</body>

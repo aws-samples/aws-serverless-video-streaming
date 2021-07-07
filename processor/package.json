@@ -1,0 +1,38 @@
+{
+  "name": "live-streaming-server",
+  "version": "1.0.15",
+  "description": "Live Streaming",
+  "main": "app.js",
+  "scripts": {
+    "test": "NODE_ENV=development node app.js",
+    "start": "node app.js",
+    "get-login": "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com",
+    "build": "docker build -t video-streaming-processor .",
+    "tag": "docker tag video-streaming-processor:latest $ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/video-streaming-processor:latest",
+    "push": "docker push $ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/video-streaming-processor:latest",
+    "deploy": "yarn run build && yarn run tag && yarn run push"
+  },
+  "keywords": [
+    "rtmp",
+    "flv",
+    "server"
+  ],
+  "license": "MIT-0",
+  "dependencies": {
+    "aws-sdk": "^2.853.0",
+    "axios": "^0.21.1",
+    "chalk": "^4.1.0",
+    "chokidar": "^3.5.1",
+    "ejs": "^3.1.6",
+    "image-downloader": "^4.0.1",
+    "lodash": "^4.17.21",
+    "node-media-server": "2.2.4",
+    "pam-diff": "^0.8.5",
+    "pipe2pam": "^0.6.2",
+    "polygon-points": "^0.4.0",
+    "redis": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  }
+}

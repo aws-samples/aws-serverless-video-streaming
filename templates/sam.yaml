@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# SPDX-License-Identifier: MIT-0 License
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'crud
+
+  '
+Globals:
+  Function:
+    Timeout: 3
+Resources:
+  getStreams:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://live-video-and-vod-platform-template/4f09c69adce58d91db812a6255a3ec13
+      Handler: streams.handler
+      Runtime: nodejs12.x
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: DynamoDBTable
+      Environment:
+        Variables:
+          SAMPLE_TABLE:
+            Ref: DynamoDBTable
+      Events:
+        getStreams:
+          Type: Api
+          Properties:
+            Path: /videostream/{id}
+            Method: any
+        allOperations:
+          Type: Api
+          Properties:
+            Path: /videostream
+            Method: post
+        allGetOperations:
+          Type: Api
+          Properties:
+            Path: /videostream
+            Method: get
+  # DynamoDBTable:
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     TableName: video-metadata
+  #     AttributeDefinitions:
+  #     - AttributeName: id
+  #       AttributeType: S
+  #     KeySchema:
+  #     - AttributeName: id
+  #       KeyType: HASH
+  #     ProvisionedThroughput:
+  #       ReadCapacityUnits: 1
+  #       WriteCapacityUnits: 1
+  #     StreamSpecification:
+  #       StreamViewType: NEW_IMAGE
+Outputs:
+  WebEndpoint:
+    Description: API Gateway endpoint URL for Prod stage
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/

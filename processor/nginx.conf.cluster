@@ -1,0 +1,99 @@
+worker_processes  auto;
+
+error_log /dev/stdout info;
+
+
+events {
+  worker_connections  1024;
+}
+
+http {
+  include       /etc/nginx/mime.types;
+  default_type  application/octet-stream;
+
+  log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for"';
+
+  access_log /dev/stdout main;
+
+  sendfile        on;
+
+  keepalive_timeout  65;
+
+  gzip on;
+  
+
+  ignore_invalid_headers off;
+
+  upstream node-backend {
+    server localhost:8080 max_fails=0;
+  }
+
+  server {
+    listen 8000;
+    server_name localhost;
+    sendfile off;
+
+    location ~ \.m3u8 {
+      add_header Cache-Control "no-cache";
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS';
+      root /media/livestreaming;
+    }
+
+    location ~ \.html {
+      add_header Cache-Control "max-age=600";
+      root /media/livestreaming;
+    }
+
+    location ~ \.js {
+      add_header Cache-Control "max-age=600";
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS';
+      root /media/livestreaming;
+    }
+
+    location ~ \.ts {
+      add_header Cache-Control "max-age=600";
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS';
+      root /media/livestreaming;
+    }
+
+    location ~ \.m4s {
+      add_header Cache-Control "max-age=600";
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS';
+      root /media/livestreaming;
+    }
+
+    location ~ \.mpd {
+      add_header Cache-Control "no-cache";
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS';
+      root /media/livestreaming;
+    }
+
+    location /nginx_status {
+      stub_status on;
+      access_log off;
+      allow 127.0.0.1;
+      deny all;
+    }
+
+    location /api/server/ {
+      proxy_pass http://node-backend/api/server/;
+    }
+
+    location ~ \.flv {
+      # add_header Cache-Control "max-age=1";
+      add_header Cache-Control "no-cache";
+      proxy_pass http://node-backend;
+    }
+
+    # location / {
+    #   proxy_pass http://node-backend/;
+    # }
+  }
+}

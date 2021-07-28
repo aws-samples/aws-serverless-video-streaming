@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: DynamoDB Resources
 
 Resources: 
-  videostreaming: 
+  videoStreaming:
     Type: AWS::DynamoDB::Table
     Properties: 
       AttributeDefinitions: 
@@ -20,3 +20,19 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       TableName: "video-streaming"
+
+  videoMetadata:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+      TableName: video-metadata

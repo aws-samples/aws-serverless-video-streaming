@@ -173,7 +173,10 @@ rtmp://<DNS Name>/stream/<stream key>
 通过 curl 发布视频流元数据
 
 ```
-curl -d '{"isFlv":true， "isHls":false，"isVideo":false， "isImage":false，"isMotion":false， "isOnDemand":false，"isCMAF":false，"video_time":"60"，"image_time":"30"，"hls_time":"2"，"hls_list_size":"5"， "outdate":"2022-12-09"}' -H "Content-Type: application/json" -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
+curl -d '{"isFlv":true, "isHls":false, "isVideo":false, "isImage":false, "isMotion":false, "isOnDemand":false, "isCMAF":false, "video_time":"60", "image_time":"30", "hls_time":"2", "hls_list_size":"5", "outdate":"2022-12-09"}' -H "Content-Type: application/json" -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
+
+输出类似
+{"isFlv":true,"isHls":false,"isVideo":false,"isImage":false,"isMotion":false,"isOnDemand":false,"isCMAF":false,"video_time":"60","image_time":"30","hls_time":"2","hls_list_size":"5","outdate":"2022-12-09","id":"d714b0d5-11b1-4cb8-97d5-6274b742e5d7","TimeStamp":1627656447,"key":"1670544000-752b3dd19347f39b0c392750c4472e17"}
 ```
 
 从DynamoDB控制台获取您的流ID和签名密钥

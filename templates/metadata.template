@@ -4,27 +4,33 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: 'crud
-
-  '
+Description: 'API endpoint to operate video metadata including video format, length, snapshot, watermark utility etc.'
 Globals:
   Function:
     Timeout: 3
+
+Parameters:
+  S3Bucket:
+    Description: Lambda assetes bucket name
+    Type: String
+
 Resources:
   getStreams:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://live-video-and-vod-platform-template/4f09c69adce58d91db812a6255a3ec13
+      # CodeUri: s3://serverless-video-streaming-cn-northwest-1/artifacts/metadata.zip
+      CodeUri:
+        Bucket: !Ref S3Bucket
+        Key: 'artifacts/metadata.zip'
       Handler: streams.handler
       Runtime: nodejs12.x
       Policies:
+      # fixed name for now
       - DynamoDBCrudPolicy:
-          TableName:
-            Ref: DynamoDBTable
+          TableName: video-metadata
       Environment:
         Variables:
-          SAMPLE_TABLE:
-            Ref: DynamoDBTable
+          SAMPLE_TABLE: video-metadata
       Events:
         getStreams:
           Type: Api
@@ -41,23 +47,8 @@ Resources:
           Properties:
             Path: /videostream
             Method: get
-  # DynamoDBTable:
-  #   Type: AWS::DynamoDB::Table
-  #   Properties:
-  #     TableName: video-metadata
-  #     AttributeDefinitions:
-  #     - AttributeName: id
-  #       AttributeType: S
-  #     KeySchema:
-  #     - AttributeName: id
-  #       KeyType: HASH
-  #     ProvisionedThroughput:
-  #       ReadCapacityUnits: 1
-  #       WriteCapacityUnits: 1
-  #     StreamSpecification:
-  #       StreamViewType: NEW_IMAGE
 Outputs:
   WebEndpoint:
-    Description: API Gateway endpoint URL for Prod stage
+    Description: API Gateway endpoint URL for video metadata operation
     Value:
       Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/

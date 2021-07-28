@@ -23,14 +23,14 @@ Parameters:
     Type: String
     Description: Server Container Port
     Default: 8080
-  QSRegion:
+  TemplateRegion:
     Description: Region for the Quick Start assets. This string can include
       numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
       or end with a hyphen (-).
     Type: String
 
 Conditions:
-  UsingDefaultRegion: !Equals [!Ref QSRegion, 'aws-cn-quickstart']
+  UsingDefaultRegion: !Equals [!Ref TemplateRegion, 'cn-north-1']
 
 Resources:
   CloudWatchLogsGroup:

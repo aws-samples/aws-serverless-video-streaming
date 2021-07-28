@@ -10,21 +10,6 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: 'Private'
-  DynamoDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: video-metadata
-      AttributeDefinitions:
-      - AttributeName: id
-        AttributeType: S
-      KeySchema:
-      - AttributeName: id
-        KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-      StreamSpecification:
-        StreamViewType: NEW_IMAGE
 Outputs:
   AssetsBucket:
     Value: !Ref 'AssetsBucket'

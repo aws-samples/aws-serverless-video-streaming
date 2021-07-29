@@ -34,7 +34,7 @@ SPDX-License-Identifier: MIT-0 License
 
 ## 方案架构：
 
-![overall-arch](./images/overall-arch.png)
+![overall-arch](./images/architecture.png)
 
 ### 架构说明：
 **视频接入服务：**

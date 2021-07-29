@@ -40,7 +40,7 @@ The solution is based on AWS ECS, API Gateway, DynamoDB and other managed servic
 
 ## Overall Architecture：
 
-![overall-arch](./images/overall-arch.png)
+![architecture](./images/architecture.png)
 
 ### Key Modules
 

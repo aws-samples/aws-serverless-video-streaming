@@ -1,0 +1,25 @@
+# Ignore Config used with code.amazon.com
+Config
+
+# Use of opensource-codeofconduct email for amazon is expected
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+
+^dist/
+node_modules/
+package-lock.json
+yarn.lock
+
+README.md
+README_en.md
+docs/
+origin/docker-compose.yml
+origin/validation_data.json
+processor/docker-compose.yml
+processor/lib/ecs.js
+processor/lib/hls.js
+proxy/docker-compose.yml
+proxy/validation_data.json
+web/client/README.md
+deployment/metadata.zip
+deployment/regional-s3-assets/metadata.zip

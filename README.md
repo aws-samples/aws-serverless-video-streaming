@@ -78,7 +78,7 @@ rtmp://<DNS Name>/stream/<stream key>
 
 **先决条件：**
 
-点击[这里](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://live-video-and-vod-platform-template.s3.cn-north-1.amazonaws.com.cn/templates/live-video-and-vod-platform.main.template.yaml)跳转到对应的AWS CloudFormation控制台（北京），点击下一步进行部署
+点击[这里](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml)跳转到对应的AWS CloudFormation控制台（北京），点击下一步进行部署
 
 ![console-snapshot](./images/console-snapshot.png)
 

@@ -48,13 +48,7 @@ Resources:
           ToPort: 2049
           SourceSecurityGroupId:
             Fn::ImportValue: 'SecurityGroup-ServerContainerSecurityGroup'
-            # TBD
-            # Fn::ImportValue:
-            #   !Sub 'video-streaming-security-ServerContainerSecurityGroup'
-      # SecurityGroupEgress:
-      #   - IpProtocol: tcp
-      #     SourceSecurityGroupId:
-      #       Fn::ImportValue: 'SecurityGroup-ServerContainerSecurityGroup'
+          Description: default NFS port number
     Metadata:
       cfn_nag:
         rules_to_suppress:

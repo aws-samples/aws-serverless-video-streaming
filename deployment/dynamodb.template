@@ -13,13 +13,13 @@ Resources:
         - 
           AttributeName: "UUID"
           KeyType: "HASH"
-        # - 
-        #   AttributeName: "Artist"
-        #   KeyType: "RANGE"
       ProvisionedThroughput: 
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       TableName: "video-streaming"
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: True
+      BillingMode: PROVISIONED
 
   videoMetadata:
     Type: AWS::DynamoDB::Table
@@ -36,3 +36,6 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_IMAGE
       TableName: video-metadata
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: True
+      BillingMode: PROVISIONED

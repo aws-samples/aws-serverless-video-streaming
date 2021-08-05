@@ -1,17 +1,113 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Asset Resources
 
-Resources: 
+Resources:
+
   AssetsBucket:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: 'Private'
+      LoggingConfiguration:
+        DestinationBucketName: !Ref LoggingBucket
+        LogFilePrefix: Assest-logs
+
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W51
+            reason: policy been defined already
+          - id: W41
+            reason: video clips encrypted in bucket can't be used for VoD
+
+  AssestS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AssetsBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+              - 's3:PutObject'
+              - 's3:DeleteObject'
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - ":iam::"
+                    - Ref: AWS::AccountId
+                    - :root
+            Resource:
+              Fn::Join:
+                - ''
+                -
+                  - Fn::GetAtt: [ AssetsBucket, Arn ]
+                  - '/*'
+
   StaticBucket:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: 'Private'
+      LoggingConfiguration:
+        DestinationBucketName: !Ref LoggingBucket
+        LogFilePrefix: Static-logs
+
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W51
+            reason: policy been defined already
+          - id: W41
+            reason: video clips encrypted in bucket can't be used for VoD
+
+  StaticS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref StaticBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+              - 's3:PutObject'
+              - 's3:DeleteObject'
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - ":iam::"
+                    - Ref: AWS::AccountId
+                    - :root
+            Resource:
+              Fn::Join:
+                - ''
+                -
+                  - Fn::GetAtt: [ StaticBucket, Arn ]
+                  - '/*'
+
+  LoggingBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      AccessControl: LogDeliveryWrite
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W35
+            reason: avoid for infinite loop in access logging requirement
+          - id: W51
+            reason: bucket for logging usage only
+          - id: W41
+            reason: logs encrypted in bucket not actual helping debugging
 Outputs:
   AssetsBucket:
     Value: !Ref 'AssetsBucket'
     Export:
       Name: 'Assets-AssetsBucket'
+  StaticBucket:
+    Value: !Ref 'StaticBucket'
+    Export:
+      Name: 'Static-AssetsBucket'

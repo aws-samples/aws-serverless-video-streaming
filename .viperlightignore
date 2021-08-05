@@ -23,3 +23,7 @@ proxy/validation_data.json
 web/client/README.md
 deployment/metadata.zip
 deployment/regional-s3-assets/metadata.zip
+deployment/clappr.min.js
+deployment/dash-shaka-playback.min.js
+deployment/level-selector.min.js
+deployment/1.1.4.browser.index.js

@@ -40,7 +40,7 @@ Resources:
     Type: AWS::ElastiCache::ReplicationGroup
     Properties:
       ReplicationGroupId: !Sub '${AWS::StackName}'
-      # AtRestEncryptionEnabled: true
+      AtRestEncryptionEnabled: true
       # TransitEncryptionEnabled: true
       AutomaticFailoverEnabled: false
       AutoMinorVersionUpgrade: true

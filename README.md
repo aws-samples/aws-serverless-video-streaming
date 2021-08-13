@@ -77,10 +77,45 @@ rtmp://<DNS Name>/stream/<stream key>
 ## 安装与部署：
 
 **先决条件：**
+- 确保您有ICP备案的域名，点击[**这里**](https://www.amazonaws.cn/support/icp/?nc1=h_ls)了解如何进行ICP备案。
 
-点击[这里](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml)跳转到对应的AWS CloudFormation控制台（北京），点击下一步进行部署
+点击[**这里**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml)跳转到对应的AWS CloudFormation控制台（北京），点击下一步进行部署
 
 ![console-snapshot](./images/console-snapshot.png)
+
+[**可选**]在方案部署完毕之后，如果您希望通过HTTPS方式分发视频流以进一步增强安全性，则可以按照下列步骤来额外配置您的CloudFront和Elastic Load Balancer服务
+
+- 步骤一，获取您域名对应的SSL证书
+安装certbot，执行如下命令（mac用户）
+```
+brew install certbot
+sudo certbot certonly --manual --preferred-challenges dns -d "*.<your domain prefix>.aws.a2z.org.cn"
+```
+执行后界面提示类似信息如下：
+```
+Please deploy a DNS TXT record under the name
+_acme-challenge.<your domain prefix>.aws.a2z.org.cn with the following value:
+
+8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****
+```
+按照提示“_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****”将对应字符串添加到您管理的域名记录中，然后点击确认您将获取到签名证书，mac用户证书存放在/etc/letsencrypt/live/目录下
+
+- 步骤二，上传SSL证书到IAM
+```
+sudo aws iam upload-server-certificate \
+--path '/cloudfront/' \
+--server-certificate-name '+.rtmp-nx.keyi.solutions.aws.a2z.org.cn' \
+--certificate-body file:///etc/letsencrypt/live/<your domain prefix>.aws.a2z.org.cn/cert.pem \
+--private-key file:///etc/letsencrypt/live/<your domain prefix>.aws.a2z.org.cn/privkey.pem \
+--certificate-chain file:///etc/letsencrypt/live/<your domain prefix>.aws.a2z.org.cn/chain.pem \
+--profile xx --region cn-northwest-1
+```
+- 步骤三，打开CloudFront控制台，找到您的distribution，然后点击General -> Edit -> Custom SSL Certificate (example.com) in "SSL Certificate” -> 选择您在之前上传的SSL证书
+![edit-cloudfront](./images/edit-cloudfront.png)
+
+- 步骤四，打开EC2控制台找到Load Balancer，找到您的前缀为origin的Load Balancer，然后点击Add listener -> Default SSL certificate -> 选择您在之前上传的SSL证书
+![edit-elb-1](./images/edit-elb-1.png)
+![edit-elb-2](./images/edit-elb-2.png)
 
 ## 管理控制台使用说明：
 

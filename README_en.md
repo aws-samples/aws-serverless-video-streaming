@@ -85,10 +85,45 @@ Function of console include:
 ## Installation & Deployment：
 
 **Prerequisite**
+- Make sure you have a domain name registered by ICP，click[**here**](https://www.amazonaws.cn/support/icp/?nc1=h_ls) to understand how to file for ICP
 
-Click [Here](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml) to jump AWS CloudFormation console (Beijing), click Next to deploy
+Click [**Here**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml) to jump AWS CloudFormation console (Beijing), click Next to deploy
 
 ![console-snapshot](./images/console-snapshot.png)
+
+[**optional**]After the solution is deployed, if you want to distribute video streams via HTTPS to further enhance security, you can follow the steps below to additionally configure your CloudFront and Elastic Load Balancer services
+
+- Step1, obtain the SSL certificate corresponding to your domain name
+install certbot，execute command below (for mac user)
+```
+brew install certbot
+sudo certbot certonly --manual --preferred-challenges dns -d "*.<your domain prefix>.aws.a2z.org.cn"
+```
+After execution, the console prompts similar information as follows:
+```
+Please deploy a DNS TXT record under the name
+_acme-challenge.<your domain prefix>.aws.a2z.org.cn with the following value:
+
+8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****
+```
+following instruction “_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****” to add the corresponding string to the domain name record you manage, and then click confirm. You will get the signed certificate. The mac user certificate is stored in the /etc/letsencrypt/live/ directory
+
+- Step2, upload SSL certificate to IAM
+```
+sudo aws iam upload-server-certificate \
+--path '/cloudfront/' \
+--server-certificate-name '+.<your domain prefix>.aws.a2z.org.cn' \
+--certificate-body file:///etc/letsencrypt/live/<your domain prefix>.aws.a2z.org.cn/cert.pem \
+--private-key file:///etc/letsencrypt/live/<your domain prefix>.aws.a2z.org.cn/privkey.pem \
+--certificate-chain file:///etc/letsencrypt/live/<your domain prefix>.aws.a2z.org.cn/chain.pem \
+--profile xx --region cn-northwest-1
+```
+- Step3, open CloudFront console, find your distribution，then click General -> Edit -> Custom SSL Certificate (example.com) in "SSL Certificate” -> choose the SSL certificate you upload in previous step
+![edit-cloudfront](./images/edit-cloudfront.png)
+
+- Step4, open EC2 console and click Load Balancer，find Load Balancer with prefix origin，then click Add listener -> Default SSL certificate -> choose the SSL certificate you upload in previous step
+![edit-elb-1](./images/edit-elb-1.png)
+![edit-elb-2](./images/edit-elb-2.png)
 
 ## Console Usage：
 

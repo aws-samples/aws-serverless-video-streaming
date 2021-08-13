@@ -19,13 +19,15 @@ Parameters:
     Description: Solution template version, check https://www.amazonaws.cn/en/solutions/ for latest version
 
 Resources:
-  getStreams:
+  MetadataFunction:
     Type: AWS::Serverless::Function
     Properties:
       # CodeUri: s3://aws-gcr-solutions-cn-north-1/serverless-video-streaming/v1.0.0/metadata.zip
       CodeUri:
         Bucket: !Ref CodeBucket
         Key: !Sub 'serverless-video-streaming/${Version}/metadata.zip'
+        # Bucket: serverless-video-streaming-cn-northwest-1
+        # Key: artifacts/metadata.zip
       Handler: streams.handler
       Runtime: nodejs12.x
       Policies:
@@ -41,18 +43,104 @@ Resources:
           Properties:
             Path: /videostream/{id}
             Method: any
+            RestApiId:
+              Ref: ApiGatewayApi
         allOperations:
           Type: Api
           Properties:
             Path: /videostream
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+            RequestModel:
+              Model: Metadata
+              Required: true
         allGetOperations:
           Type: Api
           Properties:
             Path: /videostream
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+
+  MetadataRequestValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: MetadataValidator
+        RestApiId:
+          Ref: ApiGatewayApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: true
+
+  ApiGatewayApi:
+      Type: AWS::Serverless::Api
+      Properties:
+        StageName: Prod
+        # DefinitionBody:
+        #   swagger: 2.0
+        #   x-amazon-apigateway-request-validators:
+        #     basic:
+        #       validateRequestBody: true
+        #       validateRequestParameters: false
+        #   x-amazon-apigateway-request-validator: BodyValidate
+        #   paths:
+        #     /request-path:
+        #       post:
+        #         x-amazon-apigateway-integration:
+        #           httpMethod: POST
+        #           type: aws_proxy
+        #           uri:
+        #             Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MetadataFunction.Arn}/invocations'
+        #   parameters:
+        #         - required: true
+        #           in: body
+        #           name: somemodel
+        #           schema:
+        #             $ref: '#/definitions/somemodel'
+        Models:
+          Metadata:
+            type: object
+            required:
+              - isFlv
+              - isHls
+              - isVideo
+              - isImage
+              - isMotion
+              - isOnDemand
+              - isCMAF
+              - video_time
+              - image_time
+              - hls_time
+              - hls_list_size
+              - outdate
+            properties:
+              isFlv:
+                type: boolean
+              isHls:
+                type: boolean
+              isVideo:
+                type: boolean
+              isImage:
+                type: boolean
+              isMotion:
+                type: boolean
+              isOnDemand:
+                type: boolean
+              isCMAF:
+                type: boolean
+              video_time:
+                type: string
+              image_time:
+                type: string
+              hls_time:
+                type: string
+              hls_list_size:
+                type: string
+              outdate:
+                type: string
+
 Outputs:
   WebEndpoint:
     Description: API Gateway endpoint URL for video metadata operation
     Value:
-      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+      Fn::Sub: https://${ApiGatewayApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/

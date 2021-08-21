@@ -72,9 +72,10 @@ Video live streaming, transcoding, recording, fragmentation and other functions,
 - Built-in Nginx cache to reduce the load on the server as much as possible to avoid thundering herd problem
 - Using CloudFront to optimize the downstream experience and secure video access through signed URL
 
-**Management Console**
+**Demo Web page**
+**Note that this web page is for demonstration purposes only, solution WILL NOT create such web page by default unless explicit configured in CloudFormation parameter**
 ![console](./images/console.png)
-Function of console include:
+Function of demo web page include:
 - Domain configuration
 - Live streaming managment
 - Video recording
@@ -90,6 +91,8 @@ Function of console include:
 Click [**Here**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml) to jump AWS CloudFormation console (Beijing), click Next to deploy
 
 ![console-snapshot](./images/console-snapshot.png)
+
+Click Next to configure the deployment options. InstallDemoConsole configures whether to deploy the user demo web interface, default value is false. CNAME configures the CNAMEs associated with CloudFront. ZHY/BJS region users need to use the registered domain name for association. Overseas users do not have such requirement, default value is www.example.cn
 
 [**optional**]After the solution is deployed, if you want to distribute video streams via HTTPS to further enhance security, you can follow the steps below to additionally configure your CloudFront and Elastic Load Balancer services
 
@@ -125,9 +128,73 @@ sudo aws iam upload-server-certificate \
 ![edit-elb-1](./images/edit-elb-1.png)
 ![edit-elb-2](./images/edit-elb-2.png)
 
+## Create Live Streaming Channel
+The solution uses the RESTFul API provided by API Gateway to manage video channel metadata and integrate it into existing application and management interface. After the solution is deployed, navigate to the nest stack prefixed with VideoMetadata, and check the output option to obtain the URL address created by API Gateway.
+
+![metadata-output](./images/metadata-output.png)
+
+POST the URL address through tools such as Curl or Postman to create a live channel, where the main content of the request is as follows
+
+```
+{"isFlv":true, "isHls":true, "isVideo":false, "isImage":true, "isMotion":false, "isOnDemand":false, "isCMAF":false, "video_time":"60", "image_time":"30", "hls_time":"2", "hls_list_size":"5", "outdate":"2022-12-09"}
+```
+
+create live channel by Curl
+
+```
+curl -d '{"isFlv":true, "isHls":false, "isVideo":true, "isImage":false, "isMotion":false, "isOnDemand":false, "isCMAF":false, "video_time":"60", "image_time":"30", "hls_time":"2", "hls_list_size":"5", "outdate":"2022-12-09"}' -H "Content-Type: application/json" -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
+```
+
+Create a live channel through Thunder Client. After the creation is successful, you will get the corresponding return information
+
+![metadata-create](./images/metadata-create.png)
+
+Navigate to DynamoDB console and check table named video-metadata. You can see corresponding channel information has been created. Record the two strings of channel id and key as shown in the figure.
+
+![metadata-channel-key](./images/metadata-channel-key.png)
+
+The above string is spliced ​​in the following format and used as the streaming key for subsequent video push
+
+**Streaming Key Format**
+
+```
+<id>?sign=<key>
+```
+
+**Example as follows**
+```
+70ef9b07-adbe-478d-b098-d7c8efd84a98?sign=1670371200-5db080c8cdca8764de881bc04e61e2b1
+```
+
+**Streaming URL**
+After obtaining the streaming URL from the CloudFormation console, splice the RTMP address of the video streaming in the following way:
+
+```
+rtmp://<LiveVideoPushStreamURL>/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign=1670544000-63497837275539bdb8e21800887e2db9
+```
+
+Configure corresponding streaming software e.g. OBS to push video stream
+![obs](./images/obs.png)
+
+Other configurations are shown below:
+- Encoder: x264
+- Rate Control: CBR
+- Bit Rate：1000 (or lower)
+- Key Frame Gap（Second，0=Auto）：2
+- CPU Usage Preset (higher = less CPU) ：veryfast， 
+- Tune：zerolatency
+
+View video through video player (ffplayer) or browser
+
+```
+ffplay http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/live.flv
+
+http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
+```
+
 ## Console Usage：
 
-**Create Channel**
+**Note that this web page is for demonstration purposes only, solution WILL NOT create such web page by default unless explicit configured in CloudFormation parameter**
 
 Get the management console address, push/pull stream address, and pull stream domain name from the CloudFormation console output panel, 
 
@@ -198,53 +265,6 @@ Transcode pushed live stream into a video stream with multiple resolutions and b
 Relay and forward video streams, including following functions:
 - Automatically push the original video stream to other live video platforms through such video relay
 - Synchronous live streaming with native & overseas 
-
-![relay](./images/relay.png)
-
-## API integration:
-
-You can manage metadata of the video channel through Restful API provided by API Gateway, and integrate it into your own application and management interface
-
-**Create Video Metadata**
-
-Aquire invoking URL through API Gateway console
-![api-gateway](./images/api-gateway.png)
-
-Publish video stream metadata via curl
-
-```
-curl -d '{"isFlv":true， "isHls":false，"isVideo":false， "isImage":false，"isMotion":false， "isOnDemand":false，"isCMAF":false，"video_time":"60"，"image_time":"30"，"hls_time":"2"，"hls_list_size":"5"， "outdate":"2022-12-09"}' -H "Content-Type: application/json" -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
-```
-
-Get stream ID and signing key from the DynamoDB console
-
-![dynamodb](./images/dynamodb.png)
-
-**Acquire Stream Push URL**
-Use following methods to assemble the RTMP address to push video stream, after obtaining the video streaming URL from CloudFormation console, 
-
-```
-RTMP://<LiveVideoPushStreamURL>/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign=1670544000-63497837275539bdb8e21800887e2db9
-```
-
-Configure corresponding streaming software e.g. OBS to push video stream
-![obs](./images/obs.png)
-
-Other configurations are shown below:
-- Encoder: x264
-- Rate Control: CBR
-- Bit Rate：1000 (or lower)
-- Key Frame Gap（Second，0=Auto）：2
-- CPU Usage Preset (higher = less CPU) ：veryfast， 
-- Tune：zerolatency
-
-View video through video player (ffplayer) or browser
-
-```
-ffplay http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/live.flv
-
-http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
-```
 
 ## Security
 

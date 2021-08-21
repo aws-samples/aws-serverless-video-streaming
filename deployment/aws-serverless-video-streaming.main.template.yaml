@@ -12,6 +12,10 @@ Parameters:
     Type: String
     Description: Console user password. Strict password policy is recommended.
     NoEcho: True
+  InstallDemoConsole:
+    Type: String
+    Default: No
+    Description: Install Web Console For Live Video Demostration
   CNAME:
     Type: String
     Default: www.example.cn
@@ -78,6 +82,11 @@ Parameters:
       numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
       or end with a hyphen (-).
     Type: String
+
+Conditions:
+    InstallDemoConsoleCondition: !Equals
+      - !Ref InstallDemoConsole
+      - 'True'
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -284,6 +293,7 @@ Resources:
         TemplateRegion: !Ref TemplateRegion
 
   Web:
+    Condition: InstallDemoConsoleCondition
     DependsOn:
     - SecurityGroup
     - ECS
@@ -314,5 +324,6 @@ Outputs:
     Description: Live Video Pull Stream URL Alias
     Value: !GetAtt [Origin, Outputs.OriginLoadBalancerAlias]
   LiveVideoConsoleURL:
+    Condition: InstallDemoConsoleCondition
     Description: Live Video Management Console Address
     Value: !GetAtt [Web, Outputs.WebLoadBalancerURL]

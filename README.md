@@ -64,9 +64,10 @@ rtmp://<DNS Name>/stream/<stream key>
 - 内置Nginx缓存，尽可能减少服务器上的负载，避免惊群效应
 - 利用CloudFront优化下行拉流体验，通过signed URL实现视频的安全访问
 
-**管理控制台：**
+**演示web：**
+**注意该web界面仅作演示用途，默认方案不会创建该web界面，需要在CloudFormation中的参数显式指定**
 ![console](./images/console.png)
-管理控制台功能包括：
+演示web功能包括：
 - 域名配置
 - 直播管理
 - 视频录制
@@ -82,6 +83,8 @@ rtmp://<DNS Name>/stream/<stream key>
 点击[**这里**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml)跳转到对应的AWS CloudFormation控制台（北京），点击下一步进行部署
 
 ![console-snapshot](./images/console-snapshot.png)
+
+点击下一步进行部署选项配置，其中InstallDemoConsole配置是否部署用户演示的web界面，默认为false，CNAME配置CloudFront所关联的CNAMEs，大陆用户需要使用备案域名进行关联，海外用户无此要求，默认为www.example.cn
 
 [**可选**]在方案部署完毕之后，如果您希望通过HTTPS方式分发视频流以进一步增强安全性，则可以按照下列步骤来额外配置您的CloudFront和Elastic Load Balancer服务
 
@@ -117,7 +120,75 @@ sudo aws iam upload-server-certificate \
 ![edit-elb-1](./images/edit-elb-1.png)
 ![edit-elb-2](./images/edit-elb-2.png)
 
-## 管理控制台使用说明：
+## 创建直播频道
+方案通过API Gateway提供的Restful API来对视频频道的元数据进行管理并集成到自己的应用和管理界面中。在方案部署完毕之后，跳转到前缀为VideoMetadata的nest stack，查看output选项以获取所创建的API Gateway的URL地址。
+
+![metadata-output](./images/metadata-output.png)
+
+通过Curl或者Postman等工具对该URL地址进行POST操作以创建直播频道，其中request的主体内容如下所示
+
+```
+{"isFlv":true, "isHls":true, "isVideo":false, "isImage":true, "isMotion":false, "isOnDemand":false, "isCMAF":false, "video_time":"60", "image_time":"30", "hls_time":"2", "hls_list_size":"5", "outdate":"2022-12-09"}
+```
+
+通过Curl创建直播频道
+
+```
+curl -d '{"isFlv":true, "isHls":false, "isVideo":true, "isImage":false, "isMotion":false, "isOnDemand":false, "isCMAF":false, "video_time":"60", "image_time":"30", "hls_time":"2", "hls_list_size":"5", "outdate":"2022-12-09"}' -H "Content-Type: application/json" -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
+```
+
+通过Thunder Client创建直播频道，创建成功后会获取对应的返回信息
+
+![metadata-create](./images/metadata-create.png)
+
+登陆到DynamoDB控制台，查看名为video-metadata的表项，可以看到对应的channel信息已经创建，记录下如图所示的channel id和key两个字符串.
+
+![metadata-channel-key](./images/metadata-channel-key.png)
+
+将上述字符串按照如下格式进行拼接，用作后续视频推送的串流密钥
+
+**串流密钥格式**
+
+```
+<id>?sign=<key>
+```
+
+**范例如下：**
+```
+70ef9b07-adbe-478d-b098-d7c8efd84a98?sign=1670371200-5db080c8cdca8764de881bc04e61e2b1
+```
+
+从CloudFormation控制台输出面板中获取推流域名，推流地址（其中的LiveVideoPushStreamURL）
+![cloudformation-output](./images/cloudformation-output.png)
+
+**推流网址：**
+从CloudFormation控制台获取推流地址之后，按照以下方式拼接视频推送的RTMP地址：
+
+```
+rtmp://<LiveVideoPushStreamURL>/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign=1670544000-63497837275539bdb8e21800887e2db9
+```
+
+配置对应的推流软件如OBS来进行视频推送
+![obs](./images/obs.png)
+
+其他配置如下所示：
+- 编码器：x264
+- 速率控制：CBR
+- 比特率：1000 (或更低)
+- 关键帧间隔（秒，0=自动）：2
+- CPU Usage Preset (higher = less CPU) ：veryfast， 
+- Tune：zerolatency
+
+通过视频播放器（ffplayer）或浏览器查看视频
+
+```
+ffplay http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/live.flv
+
+http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
+```
+
+## （可选）演示web使用说明：
+**注意该web界面仅作演示用途，默认方案不会创建该web界面，需要在CloudFormation中的参数显式指定**
 
 **创建直播频道**
 
@@ -195,54 +266,6 @@ sudo aws iam upload-server-certificate \
 - 实现国内和海外同步直播
 
 ![relay](./images/relay.png)
-
-## API集成：
-
-可以通过API Gateway提供的Restful API来对视频频道的元数据进行管理并集成到自己的应用和管理界面中
-
-**创建视频流元数据**
-
-获取API网关调用URL
-![api-gateway](./images/api-gateway.png)
-
-通过 curl 发布视频流元数据
-
-```
-curl -d '{"isFlv":true, "isHls":false, "isVideo":false, "isImage":false, "isMotion":false, "isOnDemand":false, "isCMAF":false, "video_time":"60", "image_time":"30", "hls_time":"2", "hls_list_size":"5", "outdate":"2022-12-09"}' -H "Content-Type: application/json" -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
-
-输出类似
-{"isFlv":true,"isHls":false,"isVideo":false,"isImage":false,"isMotion":false,"isOnDemand":false,"isCMAF":false,"video_time":"60","image_time":"30","hls_time":"2","hls_list_size":"5","outdate":"2022-12-09","id":"d714b0d5-11b1-4cb8-97d5-6274b742e5d7","TimeStamp":1627656447,"key":"1670544000-752b3dd19347f39b0c392750c4472e17"}
-```
-
-从DynamoDB控制台获取您的流ID和签名密钥
-
-![dynamodb](./images/dynamodb.png)
-
-**获取推流网址：**
-从CloudFormation控制台获取推流地址之后，通过以下方式组装视频推送的RTMP地址：
-
-```
-rtmp://<LiveVideoPushStreamURL>/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign=1670544000-63497837275539bdb8e21800887e2db9
-```
-
-配置对应的推流软件如OBS来进行视频推送
-![obs](./images/obs.png)
-
-其他配置如下所示：
-- 编码器：x264
-- 速率控制：CBR
-- 比特率：1000 (或更低)
-- 关键帧间隔（秒，0=自动）：2
-- CPU Usage Preset (higher = less CPU) ：veryfast， 
-- Tune：zerolatency
-
-通过视频播放器（ffplayer）或浏览器查看视频
-
-```
-ffplay http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/live.flv
-
-http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
-```
 
 ## Security
 

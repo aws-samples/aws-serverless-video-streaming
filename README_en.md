@@ -10,9 +10,9 @@ SPDX-FileCopyrightText: 2021 Amazon.com， Inc. or its affiliates. All Rights Re
 SPDX-License-Identifier: MIT-0 License
 -->
 
-# AWS Serverless Video Streaming Platform（[Zh](./README.md)）
+# Serverless Video Streaming Platform（[Zh](./README.md)）
 
-The solution is based on AWS ECS, API Gateway, DynamoDB and other managed services, to build a one-stop video service platform including video push, transcoding, watermarking, on-demand play and distribution functions, with characteristics of high availability, resource auto-scaling, and easy-to-use. All services involved in solution are deployed through AWS CloudFormation, with deterministic deployment with Infrastructure As Code. Whole data flows are as shown below:
+The solution is based on Amazon ECS, API Gateway, DynamoDB and other managed services, to build a one-stop video service platform including video push, transcoding, watermarking, on-demand play and distribution functions, with characteristics of high availability, resource auto-scaling, and easy-to-use. All services involved in solution are deployed through Amazon CloudFormation, with deterministic deployment with Infrastructure As Code. Whole data flows are as shown below:
 
 ![data-flow](./images/data-flow.png)
 
@@ -30,8 +30,8 @@ The solution is based on AWS ECS, API Gateway, DynamoDB and other managed servic
 - Large-concurrent uplink video cloud storage: to connect monitoring equipment and smart devices through standardized protocols, and perform recording, storage and video processing for video streaming in cloud;
 
 ## Solution Characteristic：
-- Serverlsss, end-to-end: Based on AWS cloud-native architecture, no capacity planning is required, and operation and maintenance effort is reduce to great extent;
-- Simple, open source, easy integrated: to meet the needs of non-professional customers for live video streaming, transfer, and pull to play, all service are open sourced and seamless integrated with AWS hosting services;
+- Serverlsss, end-to-end: Based on Amazon cloud-native architecture, no capacity planning is required, and operation and maintenance effort is reduce to great extent;
+- Simple, open source, easy integrated: to meet the needs of non-professional customers for live video streaming, transfer, and pull to play, all service are open sourced and seamless integrated with Amazon hosting services;
 - Large capacity supporting multiple channels: Based on ECS elastic architecture, resource can be auto-scaled according to workloads of push-pull streams, thus supporting massive video stream channel in parallel;
 - Console management: You can manage video stream metadata through graphical console and API, and you can also set up live streaming functions suitable for your business scenarios according to your needs, such as recording, transcoding, screenshots, watermarks, etc.
 - One-click deployment: One-click deployment of the solution through CloudFormation (Beijing, Ningxia region)
@@ -64,7 +64,7 @@ Video live streaming, transcoding, recording, fragmentation and other functions,
 - Video real time encoding & transcoding
 - Video & image fragmentation and S3 storagem, customized fragmentation time and transcoding parameters
 - Suppoer HTTP-FLV (2s delay) and HLS/CMAF (10s delay)
-- Adjust parameter dynamically, seamless integrate with AWS services
+- Adjust parameter dynamically, seamless integrate with Amazon services
 
 **Video Distribution**
 - Video distribution cluster management, video stream pulling path：Route53-> CloudFront-> ALB-> video distribution service-> video processing service
@@ -88,7 +88,7 @@ Function of demo web page include:
 **Prerequisite**
 - Make sure you have a domain name registered by ICP，click[**here**](https://www.amazonaws.cn/support/icp/?nc1=h_ls) to understand how to file for ICP
 
-Click [**Here**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml) to jump AWS CloudFormation console (Beijing), click Next to deploy
+Click [**Here**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml) to jump Amazon CloudFormation console (Beijing), click Next to deploy
 
 ![console-snapshot](./images/console-snapshot.png)
 
@@ -249,14 +249,14 @@ Transcode pushed live stream into a video stream with multiple resolutions and b
 - Adapt to different playback terminals; adapt to different network environments; reduce distribution costs
 - Pre-built transcoding template: 4 commonly used templates for smooth, SD, HD and ultra-definition
 
-转码模板的分辨率和码率如下所示：
+The resolution and bit rate of the transcoding template are as follows:
 
-|      | **视频画质**            | **分辨率**  | **码率（Kbps）**      |
+|      | **Quality**            | **Resolution**  | **Bitrate（Kbps）**      |
 | ---- | --------------------- | ---------- | -------------------- |
-|      | 流畅                   | 640*360    | 400                  |
-|      | 标清                   | 854*480    | 600                  |
-|      | 高清                   | 1280*720   | 1000                 |
-|      | 超清                   | 1920*1080  | 2000                 |
+|      | Smooth                   | 640*360    | 400                  |
+|      | SD                   | 854*480    | 600                  |
+|      | HD                   | 1280*720   | 1000                 |
+|      | UHD                   | 1920*1080  | 2000                 |
 
 ![codec](./images/codec.png)
 

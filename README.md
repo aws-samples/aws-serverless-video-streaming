@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT-0 License
 
 # 基于无服务架构的直播和点播方案（[En](./README_en.md))
 
-该方案基于AWS ECS，API Gateway，DynamoDB等托管服务，构建了包含视频推送，转码，水印，点播和分发等功能的一站式视频服务平台，具有服务可靠，资源弹性，部署简易等特点，方案涉及的所有服务通过AWS CloudFormation实现一键部署，其中数据流向如下：
+该方案基于Amazon ECS，API Gateway，DynamoDB等托管服务，构建了包含视频推送，转码，水印，点播和分发等功能的一站式视频服务平台，具有服务可靠，资源弹性，部署简易等特点，方案涉及的所有服务通过Amazon CloudFormation实现一键部署，其中数据流向如下：
 
 ![data-flow](./images/data-flow.png)
 
@@ -25,7 +25,7 @@ SPDX-License-Identifier: MIT-0 License
 
 ## 方案特点：
 - 无服务，端到端：基于云原生无服务架构，无需进行容量规划，减少运维负担，轻松扩展，按需付费；
-- 简单，开放，集成：方案使用简单，不用复杂的配置，满足非专业客户直播推，转，拉的需求；具备很好的开放性，同AWS托管服务无缝集成；
+- 简单，开放，集成：方案使用简单，不用复杂的配置，满足非专业客户直播推，转，拉的需求；具备很好的开放性，同Amazon托管服务无缝集成；
 - 大容量，高负载：基于ECS弹性架构，根据推拉流的负载弹性伸缩，支持海量的视频流接入和拉取；
 - 自助化管理：可以通过控制台和API对直播流元数据进行管理，也可以根据需求设置适合您业务场景的直播功能，如录制，转码，截图，水印等
 - 一键部署：通过CloudFormation实现方案的一键部署（北京，宁夏区域）
@@ -56,7 +56,7 @@ rtmp://<DNS Name>/stream/<stream key>
 - 视频流进行实时编码，转码
 - 视频和图片分片和S3存储，自定义分片时间和转码参数，
 - 支持HTTP-FLV（2秒延迟）和HLS\CMAF（10秒延迟）
-- 动态调整参数，轻松与AWS服务集成
+- 动态调整参数，轻松与Amazon服务集成
 
 **视频分发服务：**
 - ECS Server自动管理视频流分发服务器集群的数量和弹性伸缩，拉流路径：Route53-> CloudFront-> ALB-> 视频流分发服务器-> 视频流处理服务器
@@ -80,7 +80,7 @@ rtmp://<DNS Name>/stream/<stream key>
 **先决条件：**
 - 确保您有ICP备案的域名，点击[**这里**](https://www.amazonaws.cn/support/icp/?nc1=h_ls)了解如何进行ICP备案。
 
-点击[**这里**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml)跳转到对应的AWS CloudFormation控制台（北京），点击下一步进行部署
+点击[**这里**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml)跳转到对应的Amazon CloudFormation控制台（北京），点击下一步进行部署
 
 ![console-snapshot](./images/console-snapshot.png)
 

@@ -1,45 +1,22 @@
-## Frequently Asked Questions
+# Common questions
 
 ## What is this solution?
 
-This solution provides a one-click deployment method that allows you to quickly create highly available KeyCloak clusters in your own AWS account.
+The solution is based on Amazon ECS, API Gateway, DynamoDB and other managed services, to build a one-stop video service platform including video push, transcoding, watermarking, on-demand play and distribution functions, with characteristics of high availability, resource auto-scaling, and easy-to-use.
 
-## What are the scenarios for this solution?
+## What scenarios does this solution apply to?
 
-[KeyCloak](https://www.keycloak.org/) is a set of open source software that provides features such as identity management and access management, including.
+-Social media, online education, and digital media companies that need to quickly build their own video service platforms
+-ISVs that need to integrate video capabilities into their own products or solutions
 
-1. single sign-on/log-off (Single-Sign On/Out)
-2. Identity Brokering and Social Application Login (Identity Brokering and Social Login)
-3. user federation (User Federation)
+## How does this solution work?
 
-## How does the solution work?
+After you register an Amazon Web Service account, log in to the [**official website**] (https://www.amazonaws.cn/support/icp/?nc1=h_ls) where the solution is located, and click the button to navigate to the Amazon CloudFormation console to deploy whole solution. Users only need to pay for the services involved in the solution. The solution design and code templates are open sourced based on the MIT-0 protocol. Users can choose to use it out of the box or implement customized development.
 
-CloudFormation template or AWS CDK is used to automatically deploy and configure KeyCloak clusters. After deployment, the entire KeyCloak service will run in the Amaozn ECS environment supported by AWS Fargate, and the corresponding database clusters and ALB load balancers will be automatically configured to provide a complete set of highly available KeyCloak environment.
+## What prerequisites do I need to pay attention to before starting?
 
+You need to register for an Amazon Web Service account. Also domain names filed with ICP are mandatory for customers account in Mainland China, click [**Here**](https://www.amazonaws.cn/support/icp/?nc1=h_ls) to learn how ICP filing.
 
-## What prerequisites do I need to be aware of before starting?
+## Which regions does this solution support?
 
-1. Make sure you have at least two public subnets, two private subnets, and one NAT gateway on the public subnet in the target area of the VPC.
-2. Make sure you have a domain name that has been filed with ICP.
-
-
-## What regions is this solution supported to run in?
-
-You can deploy to major AWS regions worldwide, including the AWS (Ningxia) region operated by Xiyun Data and the AWS (Beijing) region operated by Huanhuan New Network.
-
-## What database types are supported by this solution
-
-Any of the following database types can be selected.
-
-1. Amazon RDS Database Cluster includes two database instances to provide a highly available environment
-2. Amazon Aurora Serverless Database Cluster provides a highly available environment, and this model does not generate any database instances
-3. Amazon RDS Database instance, which only provides a single database instance and is not recommended for production environments
-
-## How to specify the initial username and password
-
-The initial administrator accounts and passwords for KeyCloak and Database services will be automatically generated and saved through AWS Secrets Manager for security and compliance purposes.
-
-## What to do if you fail to deploy Auora Serverless
-
-Some AWS regions, such as `us-west-2`, have some AZs that do not support Aurora Serverless support, resulting in deployment failure. Please refer to the AWS CloudFormation failure message and select the appropriate AZ for deployment, see [#5](https://github.com/) aws-samples/keycloak-on-aws/issues/5)
-
+You can deploy to Amazon's major global regions, including Ningxia region operated by West Cloud Data and Beijing region operated by Sinnet.

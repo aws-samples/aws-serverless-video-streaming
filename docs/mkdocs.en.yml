@@ -1,4 +1,5 @@
 INHERIT: ./mkdocs.base.yml
+site_name: Serverless Video Streaming Platform Deployment Guide
 docs_dir: en
 site_dir: ./site/en
 theme:

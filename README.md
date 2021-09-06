@@ -90,20 +90,25 @@ rtmp://<DNS Name>/stream/<stream key>
 
 - 步骤一，获取您域名对应的SSL证书
 安装certbot，执行如下命令（mac用户）
+
 ```
 brew install certbot
 sudo certbot certonly --manual --preferred-challenges dns -d "*.<your domain prefix>.aws.a2z.org.cn"
 ```
+
 执行后界面提示类似信息如下：
+
 ```
 Please deploy a DNS TXT record under the name
 _acme-challenge.<your domain prefix>.aws.a2z.org.cn with the following value:
 
 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****
 ```
+
 按照提示“_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****”将对应字符串添加到您管理的域名记录中，然后点击确认您将获取到签名证书，mac用户证书存放在/etc/letsencrypt/live/目录下
 
 - 步骤二，上传SSL证书到IAM
+
 ```
 sudo aws iam upload-server-certificate \
 --path '/cloudfront/' \
@@ -113,10 +118,13 @@ sudo aws iam upload-server-certificate \
 --certificate-chain file:///etc/letsencrypt/live/<your domain prefix>.aws.a2z.org.cn/chain.pem \
 --profile xx --region cn-northwest-1
 ```
+
 - 步骤三，打开CloudFront控制台，找到您的distribution，然后点击General -> Edit -> Custom SSL Certificate (example.com) in "SSL Certificate” -> 选择您在之前上传的SSL证书
+
 ![edit-cloudfront](./images/edit-cloudfront.png)
 
 - 步骤四，打开EC2控制台找到Load Balancer，找到您的前缀为origin的Load Balancer，然后点击Add listener -> Default SSL certificate -> 选择您在之前上传的SSL证书
+
 ![edit-elb-1](./images/edit-elb-1.png)
 ![edit-elb-2](./images/edit-elb-2.png)
 
@@ -154,11 +162,13 @@ curl -d '{"isFlv":true, "isHls":false, "isVideo":true, "isImage":false, "isMotio
 ```
 
 **范例如下：**
+
 ```
 70ef9b07-adbe-478d-b098-d7c8efd84a98?sign=1670371200-5db080c8cdca8764de881bc04e61e2b1
 ```
 
 从CloudFormation控制台输出面板中获取推流域名，推流地址（其中的LiveVideoPushStreamURL）
+
 ![cloudformation-output](./images/cloudformation-output.png)
 
 **推流网址：**
@@ -169,6 +179,7 @@ rtmp://<LiveVideoPushStreamURL>/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign
 ```
 
 配置对应的推流软件如OBS来进行视频推送
+
 ![obs](./images/obs.png)
 
 其他配置如下所示：

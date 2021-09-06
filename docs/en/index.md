@@ -110,10 +110,10 @@ After execution, the console prompts similar information as follows:
 Please deploy a DNS TXT record under the name
 _acme-challenge.<your domain prefix>.aws.a2z.org.cn with the following value:
 
-8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****
+8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx
 
 ```
-following instruction “_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****” to add the corresponding string to the domain name record you manage, and then click confirm. You will get the signed certificate. The mac user certificate is stored in the /etc/letsencrypt/live/ directory
+following instruction “_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx” to add the corresponding string to the domain name record you manage, and then click confirm. You will get the signed certificate. The mac user certificate is stored in the /etc/letsencrypt/live/ directory
 
 - Step2, upload SSL certificate to IAM
 

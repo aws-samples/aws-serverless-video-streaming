@@ -102,10 +102,10 @@ sudo certbot certonly --manual --preferred-challenges dns -d "*.<your domain pre
 Please deploy a DNS TXT record under the name
 _acme-challenge.<your domain prefix>.aws.a2z.org.cn with the following value:
 
-8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****
+8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx
 ```
 
-按照提示“_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****”将对应字符串添加到您管理的域名记录中，然后点击确认您将获取到签名证书，mac用户证书存放在/etc/letsencrypt/live/目录下
+按照提示“_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx”将对应字符串添加到您管理的域名记录中，然后点击确认您将获取到签名证书，mac用户证书存放在/etc/letsencrypt/live/目录下
 
 - 步骤二，上传SSL证书到IAM
 

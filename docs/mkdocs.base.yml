@@ -1,6 +1,6 @@
 site_name: My Docs
 site_url: https://example.com/
-repo_url: https://github.com/wchaws/mkdocs-playground
+repo_url: https://github.com/aws-samples/aws-serverless-video-streaming
 theme:
   name: material
   features:
@@ -12,8 +12,8 @@ plugins:
 extra:
   alternate:
     - name: English
-      link: /mkdocs-playground/en/
+      link: /aws-serverless-video-streaming/en/
       lang: en
     - name: 中文
-      link: /mkdocs-playground/zh/
+      link: /aws-serverless-video-streaming/zh/
       lang: zh

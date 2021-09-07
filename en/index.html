@@ -1,0 +1,746 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="canonical" href="https://example.com/">
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.6">
+    
+    
+      
+        <title>Serverless Video Streaming Platform Deployment Guide</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.802231af.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.3f5d1f46.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL(".",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#serverless-video-streaming-platformzh" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="Serverless Video Streaming Platform Deployment Guide" class="md-header__button md-logo" aria-label="Serverless Video Streaming Platform Deployment Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Serverless Video Streaming Platform Deployment Guide
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Home
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <div class="md-header__option">
+        <div class="md-select">
+          
+          <button class="md-header__button md-icon" aria-label="Select language">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24z"/></svg>
+          </button>
+          <div class="md-select__inner">
+            <ul class="md-select__list">
+              
+                <li class="md-select__item">
+                  <a href="/aws-serverless-video-streaming/en/" hreflang="en" class="md-select__link">
+                    English
+                  </a>
+                </li>
+                
+                <li class="md-select__item">
+                  <a href="/aws-serverless-video-streaming/zh/" hreflang="zh" class="md-select__link">
+                    中文
+                  </a>
+                </li>
+                
+            </ul>
+          </div>
+        </div>
+      </div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/aws-samples/aws-serverless-video-streaming/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="Serverless Video Streaming Platform Deployment Guide" class="md-nav__button md-logo" aria-label="Serverless Video Streaming Platform Deployment Guide" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    Serverless Video Streaming Platform Deployment Guide
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/aws-samples/aws-serverless-video-streaming/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Home
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        Home
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#solution-features" class="md-nav__link">
+    Solution Features：
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#solution-applicable-senario" class="md-nav__link">
+    Solution Applicable Senario：
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#solution-characteristic" class="md-nav__link">
+    Solution Characteristic：
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overall-architecture" class="md-nav__link">
+    Overall Architecture：
+  </a>
+  
+    <nav class="md-nav" aria-label="Overall Architecture：">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-modules" class="md-nav__link">
+    Key Modules
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-deployment" class="md-nav__link">
+    Installation &amp; Deployment：
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-live-streaming-channel" class="md-nav__link">
+    Create Live Streaming Channel
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#console-usage" class="md-nav__link">
+    Console Usage：
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    Security
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#solution-features" class="md-nav__link">
+    Solution Features：
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#solution-applicable-senario" class="md-nav__link">
+    Solution Applicable Senario：
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#solution-characteristic" class="md-nav__link">
+    Solution Characteristic：
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overall-architecture" class="md-nav__link">
+    Overall Architecture：
+  </a>
+  
+    <nav class="md-nav" aria-label="Overall Architecture：">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-modules" class="md-nav__link">
+    Key Modules
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-deployment" class="md-nav__link">
+    Installation &amp; Deployment：
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-live-streaming-channel" class="md-nav__link">
+    Create Live Streaming Channel
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#console-usage" class="md-nav__link">
+    Console Usage：
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    Security
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/aws-samples/aws-serverless-video-streaming/edit/master/docs/index.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <!--
+SPDX-FileCopyrightText: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0 License
+-->
+
+<!--
+SPDX-FileCopyrightText: 2021 Amazon.com， Inc. or its affiliates. All Rights Reserved.
+
+SPDX-License-Identifier: MIT-0 License
+-->
+
+<h1 id="serverless-video-streaming-platformzh">Serverless Video Streaming Platform（<a href="./README.md">Zh</a>）</h1>
+<p>The solution is based on Amazon ECS, API Gateway, DynamoDB and other managed services, to build a one-stop video service platform including video push, transcoding, watermarking, on-demand play and distribution functions, with characteristics of high availability, resource auto-scaling, and easy-to-use. All services involved in solution are deployed through Amazon CloudFormation, with deterministic deployment with Infrastructure As Code. Whole data flows are as shown below:</p>
+<p><img alt="data-flow" src="images/data-flow.png" /></p>
+<h2 id="solution-features">Solution Features：</h2>
+<ul>
+<li>Streaming: Provides streaming addresses and access to a large number of devices, supports mainstream RTMP protocol; supports common third-party streaming software such as OBS, supports common third-party RTMP streaming hardware (encoders or boxes);</li>
+<li>Video playback: support HTTP-FLV (2 seconds delay) and HLS/CMAF (more than 10 seconds delay) three playback protocols; support common third-party FLV, RTMP, HLS players VLC, FFPLAY;</li>
+<li>Video processing functions: video transcoding, video recording, video screenshots, live watermarking, live relaying, etc.;</li>
+<li>Video frequency storage and on-demand: video storage (cold/hot layering is available), support recording hls fragments on-demand;</li>
+<li>Management console: Provide API management and graphical management;</li>
+<li>Address management: unified streaming domain name and streaming domain name management;</li>
+<li>Security: supports push stream URL authentication, using CloudFront signed URL for playback authentication, supports playback URL anti-theft chaining and playback authentication;</li>
+</ul>
+<h2 id="solution-applicable-senario">Solution Applicable Senario：</h2>
+<ul>
+<li>Ordinary/low-latency live streaming: to meet the ordinary and low-latency live streaming needs of small and medium-sized customers, such as live streaming in games, e-commerce, media, education and other industries;</li>
+<li>Large-concurrent uplink video cloud storage: to connect monitoring equipment and smart devices through standardized protocols, and perform recording, storage and video processing for video streaming in cloud;</li>
+</ul>
+<h2 id="solution-characteristic">Solution Characteristic：</h2>
+<ul>
+<li>Serverlsss, end-to-end: Based on Amazon cloud-native architecture, no capacity planning is required, and operation and maintenance effort is reduce to great extent;</li>
+<li>Simple, open source, easy integrated: to meet the needs of non-professional customers for live video streaming, transfer, and pull to play, all service are open sourced and seamless integrated with Amazon hosting services;</li>
+<li>Large capacity supporting multiple channels: Based on ECS elastic architecture, resource can be auto-scaled according to workloads of push-pull streams, thus supporting massive video stream channel in parallel;</li>
+<li>Console management: You can manage video stream metadata through graphical console and API, and you can also set up live streaming functions suitable for your business scenarios according to your needs, such as recording, transcoding, screenshots, watermarks, etc.</li>
+<li>One-click deployment: One-click deployment of the solution through CloudFormation (Beijing, Ningxia region)</li>
+</ul>
+<p><img alt="image-feature" src="images/image-feature.png" /></p>
+<h2 id="overall-architecture">Overall Architecture：</h2>
+<p><img alt="architecture" src="images/architecture.png" /></p>
+<h3 id="key-modules">Key Modules</h3>
+<p><strong>Video Proxy</strong></p>
+<p>High-availability proxy server cluster built on ECS Service, providing RTMP streaming addresses and massive devices accessing, adopts lightweight HAPoxy, supports RTMP and provides unified streaming addresses:</p>
+<pre><code>RTMP://&lt;DNS Name&gt;/stream/&lt;stream key&gt;
+</code></pre>
+<p><strong>Video Gateway</strong>
+High-performance and lightweight RTMP server based on Node media server, support RTMP, RTMPs stream access, maintain metadata including streaming status, channel session etc., maintain push stream client status based on event callbacks, to monitor client's online staus, and schedule ECS tasks accordingly.</p>
+<p><strong>Meta Data Management</strong>
+Use dynamodb to manage metadata of video stream, and provide Restful API of CRUD management of metadata through the API gateway; Dynamically configure video stream processing parameters; Auto generate a unique video push channel; Fetch video push &amp; pull URLs through the API</p>
+<p><strong>Video Processing</strong>
+Video live streaming, transcoding, recording, fragmentation and other functions, using ECS cluster to manage resource scheduling and auto scaling, providing functions including:
+- High performance ngnix http server
+- Video real time encoding &amp; transcoding
+- Video &amp; image fragmentation and S3 storagem, customized fragmentation time and transcoding parameters
+- Suppoer HTTP-FLV (2s delay) and HLS/CMAF (10s delay)
+- Adjust parameter dynamically, seamless integrate with Amazon services</p>
+<p><strong>Video Distribution</strong>
+- Video distribution cluster management, video stream pulling path：Route53-&gt; CloudFront-&gt; ALB-&gt; video distribution service-&gt; video processing service
+- Realize multiple input streams to one output through automatic addressing
+- Built-in Nginx cache to reduce the load on the server as much as possible to avoid thundering herd problem
+- Using CloudFront to optimize the downstream experience and secure video access through signed URL</p>
+<p><strong>Demo Web page</strong>
+<strong>Note that this web page is for demonstration purposes only, solution WILL NOT create such web page by default unless explicit configured in CloudFormation parameter</strong>
+<img alt="console" src="images/console.png" />
+Function of demo web page include:
+- Domain configuration
+- Live streaming managment
+- Video recording
+- Watermark configuration
+- Video Relay
+- VoD</p>
+<h2 id="installation-deployment">Installation &amp; Deployment：</h2>
+<p><strong>Prerequisite</strong>
+- Make sure you have a domain name registered by ICP，click<a href="https://www.amazonaws.cn/support/icp/?nc1=h_ls"><strong>here</strong></a> to understand how to file for ICP</p>
+<p>Click <a href="https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&amp;templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml"><strong>Here</strong></a> to jump Amazon CloudFormation console (Beijing), click Next to deploy</p>
+<p><img alt="console-snapshot" src="images/console-snapshot.png" /></p>
+<p>Click Next to configure the deployment options. InstallDemoConsole configures whether to deploy the user demo web interface, default value is false. CNAME configures the CNAMEs associated with CloudFront. ZHY/BJS region users need to use the registered domain name for association. Overseas users do not have such requirement, default value is www.example.cn</p>
+<p>[<strong>optional</strong>]After the solution is deployed, if you want to distribute video streams via HTTPS to further enhance security, you can follow the steps below to additionally configure your CloudFront and Elastic Load Balancer services</p>
+<ul>
+<li>Step1, obtain the SSL certificate corresponding to your domain name
+install certbot，execute command below (for mac user)</li>
+</ul>
+<pre><code>brew install certbot
+sudo certbot certonly --manual --preferred-challenges dns -d &quot;*.&lt;your domain prefix&gt;.aws.a2z.org.cn&quot;
+</code></pre>
+<p>After execution, the console prompts similar information as follows:</p>
+<pre><code>Please deploy a DNS TXT record under the name
+_acme-challenge.&lt;your domain prefix&gt;.aws.a2z.org.cn with the following value:
+
+8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx
+
+</code></pre>
+<p>following instruction “_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx” to add the corresponding string to the domain name record you manage, and then click confirm. You will get the signed certificate. The mac user certificate is stored in the /etc/letsencrypt/live/ directory</p>
+<ul>
+<li>Step2, upload SSL certificate to IAM</li>
+</ul>
+<pre><code>sudo aws iam upload-server-certificate \
+--path '/cloudfront/' \
+--server-certificate-name '+.&lt;your domain prefix&gt;.aws.a2z.org.cn' \
+--certificate-body file:///etc/letsencrypt/live/&lt;your domain prefix&gt;.aws.a2z.org.cn/cert.pem \
+--private-key file:///etc/letsencrypt/live/&lt;your domain prefix&gt;.aws.a2z.org.cn/privkey.pem \
+--certificate-chain file:///etc/letsencrypt/live/&lt;your domain prefix&gt;.aws.a2z.org.cn/chain.pem \
+--profile xx --region cn-northwest-1
+</code></pre>
+<ul>
+<li>Step3, open CloudFront console, find your distribution，then click General -&gt; Edit -&gt; Custom SSL Certificate (example.com) in "SSL Certificate” -&gt; choose the SSL certificate you upload in previous step</li>
+</ul>
+<p><img alt="edit-cloudfront" src="images/edit-cloudfront.png" /></p>
+<ul>
+<li>Step4, open EC2 console and click Load Balancer，find Load Balancer with prefix origin，then click Add listener -&gt; Default SSL certificate -&gt; choose the SSL certificate you upload in previous step</li>
+</ul>
+<p><img alt="edit-elb-1" src="images/edit-elb-1.png" />
+<img alt="edit-elb-2" src="images/edit-elb-2.png" /></p>
+<h2 id="create-live-streaming-channel">Create Live Streaming Channel</h2>
+<p>The solution uses the RESTFul API provided by API Gateway to manage video channel metadata and integrate it into existing application and management interface. After the solution is deployed, navigate to the nest stack prefixed with VideoMetadata, and check the output option to obtain the URL address created by API Gateway.</p>
+<p><img alt="metadata-output" src="images/metadata-output.png" /></p>
+<p>POST the URL address through tools such as Curl or Postman to create a live channel, where the main content of the request is as follows</p>
+<pre><code>{&quot;isFlv&quot;:true, &quot;isHls&quot;:true, &quot;isVideo&quot;:false, &quot;isImage&quot;:true, &quot;isMotion&quot;:false, &quot;isOnDemand&quot;:false, &quot;isCMAF&quot;:false, &quot;video_time&quot;:&quot;60&quot;, &quot;image_time&quot;:&quot;30&quot;, &quot;hls_time&quot;:&quot;2&quot;, &quot;hls_list_size&quot;:&quot;5&quot;, &quot;outdate&quot;:&quot;2022-12-09&quot;}
+</code></pre>
+<p>create live channel by Curl</p>
+<pre><code>curl -d '{&quot;isFlv&quot;:true, &quot;isHls&quot;:false, &quot;isVideo&quot;:true, &quot;isImage&quot;:false, &quot;isMotion&quot;:false, &quot;isOnDemand&quot;:false, &quot;isCMAF&quot;:false, &quot;video_time&quot;:&quot;60&quot;, &quot;image_time&quot;:&quot;30&quot;, &quot;hls_time&quot;:&quot;2&quot;, &quot;hls_list_size&quot;:&quot;5&quot;, &quot;outdate&quot;:&quot;2022-12-09&quot;}' -H &quot;Content-Type: application/json&quot; -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
+</code></pre>
+<p>Create a live channel through Thunder Client. After the creation is successful, you will get the corresponding return information</p>
+<p><img alt="metadata-create" src="images/metadata-create.png" /></p>
+<p>Navigate to DynamoDB console and check table named video-metadata. You can see corresponding channel information has been created. Record the two strings of channel id and key as shown in the figure.</p>
+<p><img alt="metadata-channel-key" src="images/metadata-channel-key.png" /></p>
+<p>The above string is spliced ​​in the following format and used as the streaming key for subsequent video push</p>
+<p><strong>Streaming Key Format</strong></p>
+<pre><code>&lt;id&gt;?sign=&lt;key&gt;
+</code></pre>
+<p><strong>Example as follows</strong></p>
+<pre><code>70ef9b07-adbe-478d-b098-d7c8efd84a98?sign=1670371200-5db080c8cdca8764de881bc04e61e2b1
+</code></pre>
+<p><strong>Streaming URL</strong>
+After obtaining the streaming URL from the CloudFormation console, splice the RTMP address of the video streaming in the following way:</p>
+<pre><code>rtmp://&lt;LiveVideoPushStreamURL&gt;/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign=1670544000-63497837275539bdb8e21800887e2db9
+</code></pre>
+<p>Configure corresponding streaming software e.g. OBS to push video stream</p>
+<p><img alt="obs" src="images/obs.png" /></p>
+<p>Other configurations are shown below:
+- Encoder: x264
+- Rate Control: CBR
+- Bit Rate：1000 (or lower)
+- Key Frame Gap（Second，0=Auto）：2
+- CPU Usage Preset (higher = less CPU) ：veryfast， 
+- Tune：zerolatency</p>
+<p>View video through video player (ffplayer) or browser</p>
+<pre><code>ffplay http://&lt;LiveVideoPullStreamURL&gt;/98724e64-bcd1-4887-af4a-60be440709aa/live.flv
+
+http://&lt;LiveVideoPullStreamURL&gt;/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
+</code></pre>
+<h2 id="console-usage">Console Usage：</h2>
+<p><strong>Note that this web page is for demonstration purposes only, solution WILL NOT create such web page by default unless explicit configured in CloudFormation parameter</strong></p>
+<p>Get the management console address, push/pull stream address, and pull stream domain name from the CloudFormation console output panel, </p>
+<p><img alt="cloudformation-output" src="images/cloudformation-output.png" /></p>
+<p>Log in to console address, click on the upper right corner of "Live Channel" + to create a channel, and then do the following:
+- Enter channel name, description and expiration time
+- Select the video output format, for example: HLS, FLV, CMAF
+- Platform will automatically generates a signatured push address based on the domain name and expiration time</p>
+<p><img alt="create-channel" src="images/create-channel.png" /></p>
+<p><strong>Get video push address and playback address</strong></p>
+<p>Follow steps below：
+- Click the arrow button to automatically generate the push stream address and playback address
+- Automatically generate signature push address and push QR code based on expiration time and private key
+- Automatically generate HLS, FLV, CMAF streaming addresses</p>
+<p><img alt="get-address" src="images/get-address.png" /></p>
+<p><strong>Preview live streaming</strong></p>
+<p>Follow steps below：
+- Click the avatar button to display details
+- Auto generated video stream playback address and QR code are displayed
+- Preview will displayed according to different video output formats
+- It takes about 35 seconds to see the live streaming online after initial push</p>
+<p><strong>Video Recording</strong></p>
+<p>To record and screenshot live video streaming according configured parameters, follow steps below:
+- Click switch button turn on corresponding function
+- Support JPG, MP4 and HLS output format
+- Assetes store in auto created S3 bucket
+- Set suitable snapshot &amp; record frequency for optimized cost</p>
+<p><img alt="record" src="images/record.png" /></p>
+<p><strong>Video Watchmark</strong></p>
+<p>Add pictures, icons or texts to original streaming video screen, including the following functions:
+- Support picture pictures, icons and texts
+- Configurable parameter including watermark position, size, text and text attributes
+- Picture watermark parameters: picture URL address, picture height, width, left and right spacing</p>
+<p><img alt="watermark" src="images/watermark.png" /></p>
+<p><strong>Video Transcoding</strong></p>
+<p>Transcode pushed live stream into a video stream with multiple resolutions and bitrate specifications, functions include:
+- Adapt to different playback terminals; adapt to different network environments; reduce distribution costs
+- Pre-built transcoding template: 4 commonly used templates for smooth, SD, HD and ultra-definition</p>
+<p>The resolution and bit rate of the transcoding template are as follows:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Quality</strong></th>
+<th><strong>Resolution</strong></th>
+<th><strong>Bitrate（Kbps）</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>Smooth</td>
+<td>640*360</td>
+<td>400</td>
+</tr>
+<tr>
+<td></td>
+<td>SD</td>
+<td>854*480</td>
+<td>600</td>
+</tr>
+<tr>
+<td></td>
+<td>HD</td>
+<td>1280*720</td>
+<td>1000</td>
+</tr>
+<tr>
+<td></td>
+<td>UHD</td>
+<td>1920*1080</td>
+<td>2000</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="codec" src="images/codec.png" /></p>
+<p><strong>Video Relay</strong></p>
+<p>Relay and forward video streams, including following functions:
+- Automatically push the original video stream to other live video platforms through such video relay
+- Synchronous live streaming with native &amp; overseas </p>
+<h2 id="security">Security</h2>
+<p>See <a href="CONTRIBUTING.md#security-issue-notifications">CONTRIBUTING</a> for more information.</p>
+<h2 id="license">License</h2>
+<p>This library is licensed under the MIT-0 License. See the LICENSE file.</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": ".", "features": ["tabs", "search.suggest", "search.highlight"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.409db549.min.js", "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.756773cc.min.js"></script>
+      
+    
+  </body>
+</html>

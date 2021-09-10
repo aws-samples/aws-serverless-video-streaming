@@ -53,13 +53,13 @@ RTMP://<DNS Name>/stream/<stream key>
 ```
 
 **Video Gateway**
-High-performance and lightweight RTMP server based on Node media server, support RTMP, RTMPs stream access, maintain metadata including streaming status, channel session etc., maintain push stream client status based on event callbacks, to monitor client's online staus, and schedule ECS tasks accordingly.
+High-performance and lightweight RTMP server based on Node media server, support RTMP/RTMPs stream access, maintain metadata including streaming status, channel session etc., maintain push stream client status based on event callbacks, to monitor client's online status, and schedule ECS tasks accordingly
   
 **Meta Data Management**
-Use dynamodb to manage metadata of video stream, and provide Restful API of CRUD management of metadata through the API gateway; Dynamically configure video stream processing parameters; Auto generate a unique video push channel; Fetch video push & pull URLs through the API
+Use DynamoDB to manage metadata of video stream, and provide Restful API of CRUD management of metadata through the API gateway; Dynamically configure video stream processing parameters; Auto generate a unique video push channel; Fetch video push & pull URLs through the API
   
 **Video Processing**
-Video live streaming, transcoding, recording, fragmentation and other functions, using ECS cluster to manage resource scheduling and auto scaling, providing functions including:
+Video live streaming, transcoding, recording, fragmentation and other functions based on Fargate, including:
 - High performance ngnix http server
 - Video real time encoding & transcoding
 - Video & image fragmentation and S3 storagem, customized fragmentation time and transcoding parameters
@@ -67,6 +67,7 @@ Video live streaming, transcoding, recording, fragmentation and other functions,
 - Adjust parameter dynamically, seamless integrate with Amazon services
 
 **Video Distribution**
+Channel addressing and video acceleration based on Fargate and CloudFront, including:
 - Video distribution cluster management, video stream pulling path：Route53-> CloudFront-> ALB-> video distribution service-> video processing service
 - Realize multiple input streams to one output through automatic addressing
 - Built-in Nginx cache to reduce the load on the server as much as possible to avoid thundering herd problem
@@ -98,25 +99,20 @@ Click Next to configure the deployment options. InstallDemoConsole configures wh
 
 - Step1, obtain the SSL certificate corresponding to your domain name
 install certbot，execute command below (for mac user)
-
 ```
 brew install certbot
 sudo certbot certonly --manual --preferred-challenges dns -d "*.<your domain prefix>.aws.a2z.org.cn"
 ```
-
 After execution, the console prompts similar information as follows:
-
 ```
 Please deploy a DNS TXT record under the name
 _acme-challenge.<your domain prefix>.aws.a2z.org.cn with the following value:
 
 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx
-
 ```
 following instruction “_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx” to add the corresponding string to the domain name record you manage, and then click confirm. You will get the signed certificate. The mac user certificate is stored in the /etc/letsencrypt/live/ directory
 
 - Step2, upload SSL certificate to IAM
-
 ```
 sudo aws iam upload-server-certificate \
 --path '/cloudfront/' \
@@ -126,13 +122,10 @@ sudo aws iam upload-server-certificate \
 --certificate-chain file:///etc/letsencrypt/live/<your domain prefix>.aws.a2z.org.cn/chain.pem \
 --profile xx --region cn-northwest-1
 ```
-
 - Step3, open CloudFront console, find your distribution，then click General -> Edit -> Custom SSL Certificate (example.com) in "SSL Certificate” -> choose the SSL certificate you upload in previous step
-
 ![edit-cloudfront](./images/edit-cloudfront.png)
 
 - Step4, open EC2 console and click Load Balancer，find Load Balancer with prefix origin，then click Add listener -> Default SSL certificate -> choose the SSL certificate you upload in previous step
-
 ![edit-elb-1](./images/edit-elb-1.png)
 ![edit-elb-2](./images/edit-elb-2.png)
 
@@ -170,7 +163,6 @@ The above string is spliced ​​in the following format and used as the stream
 ```
 
 **Example as follows**
-
 ```
 70ef9b07-adbe-478d-b098-d7c8efd84a98?sign=1670371200-5db080c8cdca8764de881bc04e61e2b1
 ```
@@ -183,7 +175,6 @@ rtmp://<LiveVideoPushStreamURL>/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign
 ```
 
 Configure corresponding streaming software e.g. OBS to push video stream
-
 ![obs](./images/obs.png)
 
 Other configurations are shown below:

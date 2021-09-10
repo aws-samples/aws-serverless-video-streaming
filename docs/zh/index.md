@@ -38,34 +38,34 @@ SPDX-License-Identifier: MIT-0 License
 
 ### 架构说明：
 **视频接入服务：**
-高可用代理服务器集群，通过ECS Service保证节点数量，提供RTMP推流地址和海量设备的接入，采用轻量级HAPoxy，支持rtmp，提供统一的推流地址：
+高可用代理服务器集群，通过ECS Service保证节点数量，提供RTMP推流地址和海量设备的接入，采用轻量级HAPoxy，提供统一的推流地址：
 
 ```
 rtmp://<DNS Name>/stream/<stream key>
 ```
 
 **视频网关服务：**
-基于Node media server实现高性能轻量级rtmp server，支持rtmp，rtmps推流接入，维护推流状态并将保存元数据信息，基于元数据模块的会话管理，基于事件回调维护推流客户端状态，检测客户端上下线，并根据状态调度ECS任务
+基于Node media server实现高性能轻量级RTMP server，支持RTMP/RTMPS推流接入，维护推流状态并将保存元数据信息，基于元数据模块的会话管理，基于事件回调维护推流客户端状态，检测客户端上下线，并根据状态调度ECS任务
   
 **元数据管理：**
 使用dynamodb管理视频流元数据，通过API gateway提供元数据的CRUD管理的Restful API；动态设置视频流处理参数；自动生成唯一推流channel;通过API得到推流和拉流URL
   
-**视频处理服务：**
-基于Fargate实现视频转码，直播，录制，分片等功能，ECS Server自动管理流媒体服务器集群的数量和弹性伸缩，提供如下功能：
-- 高性能，基于Ngnix http server
+**视频处理服务**
+基于Fargate实现视频转码，直播，录制，分片等功能，包括：
+- 高性能，基于Ngnix HTTP server
 - 视频流进行实时编码，转码
 - 视频和图片分片和S3存储，自定义分片时间和转码参数，
 - 支持HTTP-FLV（2秒延迟）和HLS\CMAF（10秒延迟）
 - 动态调整参数，轻松与Amazon服务集成
 
-**视频分发服务：**
-- ECS Server自动管理视频流分发服务器集群的数量和弹性伸缩，拉流路径：Route53-> CloudFront-> ALB-> 视频流分发服务器-> 视频流处理服务器
+**视频分发服务**
+基于Fargate和CloudFront实现频道寻址，视频加速，包括：
+- 视频流分发底层服务的弹性伸缩
 - 通过自动寻址实现多路输入流到一路输出
 - 内置Nginx缓存，尽可能减少服务器上的负载，避免惊群效应
 - 利用CloudFront优化下行拉流体验，通过signed URL实现视频的安全访问
 
-**演示web：**
-**注意该web界面仅作演示用途，默认方案不会创建该web界面，需要在CloudFormation中的参数显式指定**
+**演示web：注意该web界面仅作演示用途，默认方案不会创建该web界面，需要在CloudFormation中的参数显式指定**
 ![console](./images/console.png)
 演示web功能包括：
 - 域名配置
@@ -90,25 +90,20 @@ rtmp://<DNS Name>/stream/<stream key>
 
 - 步骤一，获取您域名对应的SSL证书
 安装certbot，执行如下命令（mac用户）
-
 ```
 brew install certbot
 sudo certbot certonly --manual --preferred-challenges dns -d "*.<your domain prefix>.aws.a2z.org.cn"
 ```
-
 执行后界面提示类似信息如下：
-
 ```
 Please deploy a DNS TXT record under the name
 _acme-challenge.<your domain prefix>.aws.a2z.org.cn with the following value:
 
 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx
 ```
-
 按照提示“_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx”将对应字符串添加到您管理的域名记录中，然后点击确认您将获取到签名证书，mac用户证书存放在/etc/letsencrypt/live/目录下
 
 - 步骤二，上传SSL证书到IAM
-
 ```
 sudo aws iam upload-server-certificate \
 --path '/cloudfront/' \
@@ -118,13 +113,10 @@ sudo aws iam upload-server-certificate \
 --certificate-chain file:///etc/letsencrypt/live/<your domain prefix>.aws.a2z.org.cn/chain.pem \
 --profile xx --region cn-northwest-1
 ```
-
 - 步骤三，打开CloudFront控制台，找到您的distribution，然后点击General -> Edit -> Custom SSL Certificate (example.com) in "SSL Certificate” -> 选择您在之前上传的SSL证书
-
 ![edit-cloudfront](./images/edit-cloudfront.png)
 
 - 步骤四，打开EC2控制台找到Load Balancer，找到您的前缀为origin的Load Balancer，然后点击Add listener -> Default SSL certificate -> 选择您在之前上传的SSL证书
-
 ![edit-elb-1](./images/edit-elb-1.png)
 ![edit-elb-2](./images/edit-elb-2.png)
 
@@ -162,13 +154,11 @@ curl -d '{"isFlv":true, "isHls":false, "isVideo":true, "isImage":false, "isMotio
 ```
 
 **范例如下：**
-
 ```
 70ef9b07-adbe-478d-b098-d7c8efd84a98?sign=1670371200-5db080c8cdca8764de881bc04e61e2b1
 ```
 
 从CloudFormation控制台输出面板中获取推流域名，推流地址（其中的LiveVideoPushStreamURL）
-
 ![cloudformation-output](./images/cloudformation-output.png)
 
 **推流网址：**
@@ -179,7 +169,6 @@ rtmp://<LiveVideoPushStreamURL>/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign
 ```
 
 配置对应的推流软件如OBS来进行视频推送
-
 ![obs](./images/obs.png)
 
 其他配置如下所示：

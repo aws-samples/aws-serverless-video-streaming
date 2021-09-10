@@ -517,27 +517,27 @@ SPDX-License-Identifier: MIT-0 License
 <p><img alt="architecture" src="images/architecture.png" /></p>
 <h3 id="_5">架构说明：</h3>
 <p><strong>视频接入服务：</strong>
-高可用代理服务器集群，通过ECS Service保证节点数量，提供RTMP推流地址和海量设备的接入，采用轻量级HAPoxy，支持rtmp，提供统一的推流地址：</p>
+高可用代理服务器集群，通过ECS Service保证节点数量，提供RTMP推流地址和海量设备的接入，采用轻量级HAPoxy，提供统一的推流地址：</p>
 <pre><code>rtmp://&lt;DNS Name&gt;/stream/&lt;stream key&gt;
 </code></pre>
 <p><strong>视频网关服务：</strong>
-基于Node media server实现高性能轻量级rtmp server，支持rtmp，rtmps推流接入，维护推流状态并将保存元数据信息，基于元数据模块的会话管理，基于事件回调维护推流客户端状态，检测客户端上下线，并根据状态调度ECS任务</p>
+基于Node media server实现高性能轻量级RTMP server，支持RTMP/RTMPS推流接入，维护推流状态并将保存元数据信息，基于元数据模块的会话管理，基于事件回调维护推流客户端状态，检测客户端上下线，并根据状态调度ECS任务</p>
 <p><strong>元数据管理：</strong>
 使用dynamodb管理视频流元数据，通过API gateway提供元数据的CRUD管理的Restful API；动态设置视频流处理参数；自动生成唯一推流channel;通过API得到推流和拉流URL</p>
-<p><strong>视频处理服务：</strong>
-基于Fargate实现视频转码，直播，录制，分片等功能，ECS Server自动管理流媒体服务器集群的数量和弹性伸缩，提供如下功能：
-- 高性能，基于Ngnix http server
+<p><strong>视频处理服务</strong>
+基于Fargate实现视频转码，直播，录制，分片等功能，包括：
+- 高性能，基于Ngnix HTTP server
 - 视频流进行实时编码，转码
 - 视频和图片分片和S3存储，自定义分片时间和转码参数，
 - 支持HTTP-FLV（2秒延迟）和HLS\CMAF（10秒延迟）
 - 动态调整参数，轻松与Amazon服务集成</p>
-<p><strong>视频分发服务：</strong>
-- ECS Server自动管理视频流分发服务器集群的数量和弹性伸缩，拉流路径：Route53-&gt; CloudFront-&gt; ALB-&gt; 视频流分发服务器-&gt; 视频流处理服务器
+<p><strong>视频分发服务</strong>
+基于Fargate和CloudFront实现频道寻址，视频加速，包括：
+- 视频流分发底层服务的弹性伸缩
 - 通过自动寻址实现多路输入流到一路输出
 - 内置Nginx缓存，尽可能减少服务器上的负载，避免惊群效应
 - 利用CloudFront优化下行拉流体验，通过signed URL实现视频的安全访问</p>
-<p><strong>演示web：</strong>
-<strong>注意该web界面仅作演示用途，默认方案不会创建该web界面，需要在CloudFormation中的参数显式指定</strong>
+<p><strong>演示web：注意该web界面仅作演示用途，默认方案不会创建该web界面，需要在CloudFormation中的参数显式指定</strong>
 <img alt="console" src="images/console.png" />
 演示web功能包括：
 - 域名配置
@@ -579,14 +579,16 @@ _acme-challenge.&lt;your domain prefix&gt;.aws.a2z.org.cn with the following val
 --profile xx --region cn-northwest-1
 </code></pre>
 <ul>
-<li>步骤三，打开CloudFront控制台，找到您的distribution，然后点击General -&gt; Edit -&gt; Custom SSL Certificate (example.com) in "SSL Certificate” -&gt; 选择您在之前上传的SSL证书</li>
-</ul>
-<p><img alt="edit-cloudfront" src="images/edit-cloudfront.png" /></p>
-<ul>
-<li>步骤四，打开EC2控制台找到Load Balancer，找到您的前缀为origin的Load Balancer，然后点击Add listener -&gt; Default SSL certificate -&gt; 选择您在之前上传的SSL证书</li>
-</ul>
-<p><img alt="edit-elb-1" src="images/edit-elb-1.png" />
+<li>
+<p>步骤三，打开CloudFront控制台，找到您的distribution，然后点击General -&gt; Edit -&gt; Custom SSL Certificate (example.com) in "SSL Certificate” -&gt; 选择您在之前上传的SSL证书
+<img alt="edit-cloudfront" src="images/edit-cloudfront.png" /></p>
+</li>
+<li>
+<p>步骤四，打开EC2控制台找到Load Balancer，找到您的前缀为origin的Load Balancer，然后点击Add listener -&gt; Default SSL certificate -&gt; 选择您在之前上传的SSL证书
+<img alt="edit-elb-1" src="images/edit-elb-1.png" />
 <img alt="edit-elb-2" src="images/edit-elb-2.png" /></p>
+</li>
+</ul>
 <h2 id="_7">创建直播频道</h2>
 <p>方案通过API Gateway提供的Restful API来对视频频道的元数据进行管理并集成到自己的应用和管理界面中。在方案部署完毕之后，跳转到前缀为VideoMetadata的nest stack，查看output选项以获取所创建的API Gateway的URL地址。</p>
 <p><img alt="metadata-output" src="images/metadata-output.png" /></p>
@@ -607,14 +609,14 @@ _acme-challenge.&lt;your domain prefix&gt;.aws.a2z.org.cn with the following val
 <p><strong>范例如下：</strong></p>
 <pre><code>70ef9b07-adbe-478d-b098-d7c8efd84a98?sign=1670371200-5db080c8cdca8764de881bc04e61e2b1
 </code></pre>
-<p>从CloudFormation控制台输出面板中获取推流域名，推流地址（其中的LiveVideoPushStreamURL）</p>
-<p><img alt="cloudformation-output" src="images/cloudformation-output.png" /></p>
+<p>从CloudFormation控制台输出面板中获取推流域名，推流地址（其中的LiveVideoPushStreamURL）
+<img alt="cloudformation-output" src="images/cloudformation-output.png" /></p>
 <p><strong>推流网址：</strong>
 从CloudFormation控制台获取推流地址之后，按照以下方式拼接视频推送的RTMP地址：</p>
 <pre><code>rtmp://&lt;LiveVideoPushStreamURL&gt;/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign=1670544000-63497837275539bdb8e21800887e2db9
 </code></pre>
-<p>配置对应的推流软件如OBS来进行视频推送</p>
-<p><img alt="obs" src="images/obs.png" /></p>
+<p>配置对应的推流软件如OBS来进行视频推送
+<img alt="obs" src="images/obs.png" /></p>
 <p>其他配置如下所示：
 - 编码器：x264
 - 速率控制：CBR

@@ -512,17 +512,18 @@ SPDX-License-Identifier: MIT-0 License
 <pre><code>RTMP://&lt;DNS Name&gt;/stream/&lt;stream key&gt;
 </code></pre>
 <p><strong>Video Gateway</strong>
-High-performance and lightweight RTMP server based on Node media server, support RTMP, RTMPs stream access, maintain metadata including streaming status, channel session etc., maintain push stream client status based on event callbacks, to monitor client's online staus, and schedule ECS tasks accordingly.</p>
+High-performance and lightweight RTMP server based on Node media server, support RTMP/RTMPs stream access, maintain metadata including streaming status, channel session etc., maintain push stream client status based on event callbacks, to monitor client's online status, and schedule ECS tasks accordingly</p>
 <p><strong>Meta Data Management</strong>
-Use dynamodb to manage metadata of video stream, and provide Restful API of CRUD management of metadata through the API gateway; Dynamically configure video stream processing parameters; Auto generate a unique video push channel; Fetch video push &amp; pull URLs through the API</p>
+Use DynamoDB to manage metadata of video stream, and provide Restful API of CRUD management of metadata through the API gateway; Dynamically configure video stream processing parameters; Auto generate a unique video push channel; Fetch video push &amp; pull URLs through the API</p>
 <p><strong>Video Processing</strong>
-Video live streaming, transcoding, recording, fragmentation and other functions, using ECS cluster to manage resource scheduling and auto scaling, providing functions including:
+Video live streaming, transcoding, recording, fragmentation and other functions based on Fargate, including:
 - High performance ngnix http server
 - Video real time encoding &amp; transcoding
 - Video &amp; image fragmentation and S3 storagem, customized fragmentation time and transcoding parameters
 - Suppoer HTTP-FLV (2s delay) and HLS/CMAF (10s delay)
 - Adjust parameter dynamically, seamless integrate with Amazon services</p>
 <p><strong>Video Distribution</strong>
+Channel addressing and video acceleration based on Fargate and CloudFront, including:
 - Video distribution cluster management, video stream pulling path：Route53-&gt; CloudFront-&gt; ALB-&gt; video distribution service-&gt; video processing service
 - Realize multiple input streams to one output through automatic addressing
 - Built-in Nginx cache to reduce the load on the server as much as possible to avoid thundering herd problem
@@ -556,7 +557,6 @@ sudo certbot certonly --manual --preferred-challenges dns -d &quot;*.&lt;your do
 _acme-challenge.&lt;your domain prefix&gt;.aws.a2z.org.cn with the following value:
 
 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx
-
 </code></pre>
 <p>following instruction “_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx” to add the corresponding string to the domain name record you manage, and then click confirm. You will get the signed certificate. The mac user certificate is stored in the /etc/letsencrypt/live/ directory</p>
 <ul>
@@ -571,14 +571,16 @@ _acme-challenge.&lt;your domain prefix&gt;.aws.a2z.org.cn with the following val
 --profile xx --region cn-northwest-1
 </code></pre>
 <ul>
-<li>Step3, open CloudFront console, find your distribution，then click General -&gt; Edit -&gt; Custom SSL Certificate (example.com) in "SSL Certificate” -&gt; choose the SSL certificate you upload in previous step</li>
-</ul>
-<p><img alt="edit-cloudfront" src="images/edit-cloudfront.png" /></p>
-<ul>
-<li>Step4, open EC2 console and click Load Balancer，find Load Balancer with prefix origin，then click Add listener -&gt; Default SSL certificate -&gt; choose the SSL certificate you upload in previous step</li>
-</ul>
-<p><img alt="edit-elb-1" src="images/edit-elb-1.png" />
+<li>
+<p>Step3, open CloudFront console, find your distribution，then click General -&gt; Edit -&gt; Custom SSL Certificate (example.com) in "SSL Certificate” -&gt; choose the SSL certificate you upload in previous step
+<img alt="edit-cloudfront" src="images/edit-cloudfront.png" /></p>
+</li>
+<li>
+<p>Step4, open EC2 console and click Load Balancer，find Load Balancer with prefix origin，then click Add listener -&gt; Default SSL certificate -&gt; choose the SSL certificate you upload in previous step
+<img alt="edit-elb-1" src="images/edit-elb-1.png" />
 <img alt="edit-elb-2" src="images/edit-elb-2.png" /></p>
+</li>
+</ul>
 <h2 id="create-live-streaming-channel">Create Live Streaming Channel</h2>
 <p>The solution uses the RESTFul API provided by API Gateway to manage video channel metadata and integrate it into existing application and management interface. After the solution is deployed, navigate to the nest stack prefixed with VideoMetadata, and check the output option to obtain the URL address created by API Gateway.</p>
 <p><img alt="metadata-output" src="images/metadata-output.png" /></p>
@@ -603,8 +605,8 @@ _acme-challenge.&lt;your domain prefix&gt;.aws.a2z.org.cn with the following val
 After obtaining the streaming URL from the CloudFormation console, splice the RTMP address of the video streaming in the following way:</p>
 <pre><code>rtmp://&lt;LiveVideoPushStreamURL&gt;/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign=1670544000-63497837275539bdb8e21800887e2db9
 </code></pre>
-<p>Configure corresponding streaming software e.g. OBS to push video stream</p>
-<p><img alt="obs" src="images/obs.png" /></p>
+<p>Configure corresponding streaming software e.g. OBS to push video stream
+<img alt="obs" src="images/obs.png" /></p>
 <p>Other configurations are shown below:
 - Encoder: x264
 - Rate Control: CBR

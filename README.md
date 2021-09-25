@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT-0 License
 ![data-flow](./images/data-flow.png)
 
 ## 功能：
+
 - 推流：提供推流地址和海量设备的接入，支持主流RTMP协议推流；支持OBS等常见的第三方推流软件，支持常见的第三方RTMP推流硬件（编码器或盒子）；
 - 视频播放：支持HTTP-FLV（2秒延迟）和HLS/CMAF（大于10秒延迟）三种回放协议；支持常见的第三方FLV，RTMP，HLS播放器VLC，FFPLAY；
 - 视频处理功能：视频转码，视频录制，视频截图，直播水印，直播中继等；
@@ -20,10 +21,12 @@ SPDX-License-Identifier: MIT-0 License
 - 安全：推流鉴权支持推流URL鉴权，播放鉴权利用CloudFront签名URL支持播放URL防盗链以及播放鉴权；
 
 ## 方案应用场景：
+
 - 普通/低延迟直播：满足中，小型客户的普通和低延迟直播需求，如游戏，电商，媒体，教育等行业的直播；
 - 大并发上行视频云存储：将监控设备，智能设备通过标准化协议接入，在云端进行监控流的收录存储，媒体处理；
 
 ## 方案特点：
+
 - 无服务，端到端：基于云原生无服务架构，无需进行容量规划，减少运维负担，轻松扩展，按需付费；
 - 简单，开放，集成：方案使用简单，不用复杂的配置，满足非专业客户直播推，转，拉的需求；具备很好的开放性，同Amazon托管服务无缝集成；
 - 大容量，高负载：基于ECS弹性架构，根据推拉流的负载弹性伸缩，支持海量的视频流接入和拉取；
@@ -38,36 +41,41 @@ SPDX-License-Identifier: MIT-0 License
 
 ### 架构说明：
 **视频接入服务：**
-高可用代理服务器集群，通过ECS Service保证节点数量，提供RTMP推流地址和海量设备的接入，采用轻量级HAPoxy，支持rtmp，提供统一的推流地址：
+高可用代理服务器集群，通过ECS Service保证节点数量，提供RTMP推流地址和海量设备的接入，采用轻量级HAPoxy，提供统一的推流地址：
 
 ```
 rtmp://<DNS Name>/stream/<stream key>
 ```
 
 **视频网关服务：**
-基于Node media server实现高性能轻量级rtmp server，支持rtmp，rtmps推流接入，维护推流状态并将保存元数据信息，基于元数据模块的会话管理，基于事件回调维护推流客户端状态，检测客户端上下线，并根据状态调度ECS任务
+基于Node media server实现高性能轻量级RTMP server，支持RTMP/RTMPS推流接入，维护推流状态并将保存元数据信息，基于元数据模块的会话管理，基于事件回调维护推流客户端状态，检测客户端上下线，并根据状态调度ECS任务
   
 **元数据管理：**
 使用dynamodb管理视频流元数据，通过API gateway提供元数据的CRUD管理的Restful API；动态设置视频流处理参数；自动生成唯一推流channel;通过API得到推流和拉流URL
   
-**视频处理服务：**
-基于Fargate实现视频转码，直播，录制，分片等功能，ECS Server自动管理流媒体服务器集群的数量和弹性伸缩，提供如下功能：
-- 高性能，基于Ngnix http server
+**视频处理服务**
+基于Fargate实现视频转码，直播，录制，分片等功能，包括：
+
+- 高性能，基于Ngnix HTTP server
 - 视频流进行实时编码，转码
 - 视频和图片分片和S3存储，自定义分片时间和转码参数，
 - 支持HTTP-FLV（2秒延迟）和HLS\CMAF（10秒延迟）
 - 动态调整参数，轻松与Amazon服务集成
 
-**视频分发服务：**
-- ECS Server自动管理视频流分发服务器集群的数量和弹性伸缩，拉流路径：Route53-> CloudFront-> ALB-> 视频流分发服务器-> 视频流处理服务器
+**视频分发服务**
+基于Fargate和CloudFront实现频道寻址，视频加速，包括：
+
+- 视频流分发底层服务的弹性伸缩
 - 通过自动寻址实现多路输入流到一路输出
 - 内置Nginx缓存，尽可能减少服务器上的负载，避免惊群效应
 - 利用CloudFront优化下行拉流体验，通过signed URL实现视频的安全访问
 
-**演示web：**
-**注意该web界面仅作演示用途，默认方案不会创建该web界面，需要在CloudFormation中的参数显式指定**
+**演示web：注意该web界面仅作演示用途，默认方案不会创建该web界面，需要在CloudFormation中的参数显式指定**
+
 ![console](./images/console.png)
+
 演示web功能包括：
+
 - 域名配置
 - 直播管理
 - 视频录制
@@ -78,6 +86,7 @@ rtmp://<DNS Name>/stream/<stream key>
 ## 安装与部署：
 
 **先决条件：**
+
 - 确保您有ICP备案的域名，点击[**这里**](https://www.amazonaws.cn/support/icp/?nc1=h_ls)了解如何进行ICP备案。
 
 点击[**这里**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml)跳转到对应的Amazon CloudFormation控制台（北京），点击下一步进行部署
@@ -90,25 +99,20 @@ rtmp://<DNS Name>/stream/<stream key>
 
 - 步骤一，获取您域名对应的SSL证书
 安装certbot，执行如下命令（mac用户）
-
 ```
 brew install certbot
 sudo certbot certonly --manual --preferred-challenges dns -d "*.<your domain prefix>.aws.a2z.org.cn"
 ```
-
 执行后界面提示类似信息如下：
-
 ```
 Please deploy a DNS TXT record under the name
 _acme-challenge.<your domain prefix>.aws.a2z.org.cn with the following value:
 
 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****
 ```
-
 按照提示“_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****”将对应字符串添加到您管理的域名记录中，然后点击确认您将获取到签名证书，mac用户证书存放在/etc/letsencrypt/live/目录下
 
 - 步骤二，上传SSL证书到IAM
-
 ```
 sudo aws iam upload-server-certificate \
 --path '/cloudfront/' \
@@ -120,11 +124,9 @@ sudo aws iam upload-server-certificate \
 ```
 
 - 步骤三，打开CloudFront控制台，找到您的distribution，然后点击General -> Edit -> Custom SSL Certificate (example.com) in "SSL Certificate” -> 选择您在之前上传的SSL证书
-
 ![edit-cloudfront](./images/edit-cloudfront.png)
 
 - 步骤四，打开EC2控制台找到Load Balancer，找到您的前缀为origin的Load Balancer，然后点击Add listener -> Default SSL certificate -> 选择您在之前上传的SSL证书
-
 ![edit-elb-1](./images/edit-elb-1.png)
 ![edit-elb-2](./images/edit-elb-2.png)
 
@@ -162,13 +164,11 @@ curl -d '{"isFlv":true, "isHls":false, "isVideo":true, "isImage":false, "isMotio
 ```
 
 **范例如下：**
-
 ```
 70ef9b07-adbe-478d-b098-d7c8efd84a98?sign=1670371200-5db080c8cdca8764de881bc04e61e2b1
 ```
 
 从CloudFormation控制台输出面板中获取推流域名，推流地址（其中的LiveVideoPushStreamURL）
-
 ![cloudformation-output](./images/cloudformation-output.png)
 
 **推流网址：**
@@ -179,10 +179,10 @@ rtmp://<LiveVideoPushStreamURL>/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign
 ```
 
 配置对应的推流软件如OBS来进行视频推送
-
 ![obs](./images/obs.png)
 
 其他配置如下所示：
+
 - 编码器：x264
 - 速率控制：CBR
 - 比特率：1000 (或更低)
@@ -208,6 +208,7 @@ http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
 ![cloudformation-output](./images/cloudformation-output.png)
 
 登陆进入直播控制台地址，点击“直播频道”右上角+创建直播频道，然后按照如下操作：
+
 - 输入直播频道名称，描述和过期时间
 - 选择视频输出格式，例如：HLS，FLV，CMAF
 - 系统自动根据域名和过期时间生成签名推流地址
@@ -217,6 +218,7 @@ http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
 **获取推流地址和播放地址**
 
 按照如下步骤操作：
+
 - 点击箭头按钮，自动生成推流地址和播放地址
 - 自动根据过期时间和私钥生成签名推流地址和推流二维码
 - 自动生成HLS，FLV，CMAF拉流地址
@@ -227,6 +229,7 @@ http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
 **在线预览直播视频流**
 
 按照如下步骤操作：
+
 - 点击头像 按钮，显示直播视频浏览
 - 自动生成视频流播放地址和二维码
 - 根据不同的视频输出格式在线预览
@@ -235,6 +238,7 @@ http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
 **直播视频录制**
 
 根据配置的录制规则对正在直播的视频进行录制和截图，按照如下步骤操作：
+
 - 操作：点击修改按钮，修改直播视频录制的参数
 - 录制格式：录制文件的格式，支持“JPG”“MP4”和”HLS”格式
 - 存储位置:存储在自动生成的S3存储桶中（video-streaming-assets-assetsbucket开头）
@@ -246,6 +250,7 @@ http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
 **直播水印**
 
 原始流视频画面添加上各种预设好的标志图片和文字，包括如下功能：
+
 - 支持图片水印和文字水印
 - 主要参数：包括水印位置和水印大小 ，文字及文字属性
 - 图片水印参数：图片URL地址，图片高度，图片宽度，左右间距
@@ -255,6 +260,7 @@ http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
 **直播视频转码：**
 
 将推送的直播流转码成多种分辨率和码率规格的视频流，包括如下功能：
+
 - 适配不同播放终端；适配不同网络环境；降低分发成本
 - 预置转码模板：支持选择视频画质，视频画质内置了常用的流畅，标清，高清和超清四种标准模板
 - 任务类型：灵活选择转码任务类型，节省成本
@@ -273,6 +279,7 @@ http://<LiveVideoPullStreamURL>/98724e64-bcd1-4887-af4a-60be440709aa/flv.html
 **直播中继：**
 
 在直播视频流中继转发，包括如下功能：
+
 - 通过视频relay自动把原始视频流推送到其他视频直播平台
 - 实现国内和海外同步直播
 

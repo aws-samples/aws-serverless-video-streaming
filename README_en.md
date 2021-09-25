@@ -53,13 +53,14 @@ RTMP://<DNS Name>/stream/<stream key>
 ```
 
 **Video Gateway**
-High-performance and lightweight RTMP server based on Node media server, support RTMP, RTMPs stream access, maintain metadata including streaming status, channel session etc., maintain push stream client status based on event callbacks, to monitor client's online staus, and schedule ECS tasks accordingly.
+High-performance and lightweight RTMP server based on Node media server, support RTMP/RTMPs stream access, maintain metadata including streaming status, channel session etc., maintain push stream client status based on event callbacks, to monitor client's online status, and schedule ECS tasks accordingly
   
 **Meta Data Management**
-Use dynamodb to manage metadata of video stream, and provide Restful API of CRUD management of metadata through the API gateway; Dynamically configure video stream processing parameters; Auto generate a unique video push channel; Fetch video push & pull URLs through the API
+Use DynamoDB to manage metadata of video stream, and provide Restful API of CRUD management of metadata through the API gateway; Dynamically configure video stream processing parameters; Auto generate a unique video push channel; Fetch video push & pull URLs through the API
   
 **Video Processing**
-Video live streaming, transcoding, recording, fragmentation and other functions, using ECS cluster to manage resource scheduling and auto scaling, providing functions including:
+Video live streaming, transcoding, recording, fragmentation and other functions based on Fargate, including:
+
 - High performance ngnix http server
 - Video real time encoding & transcoding
 - Video & image fragmentation and S3 storagem, customized fragmentation time and transcoding parameters
@@ -67,6 +68,8 @@ Video live streaming, transcoding, recording, fragmentation and other functions,
 - Adjust parameter dynamically, seamless integrate with Amazon services
 
 **Video Distribution**
+Channel addressing and video acceleration based on Fargate and CloudFront, including:
+
 - Video distribution cluster management, video stream pulling path：Route53-> CloudFront-> ALB-> video distribution service-> video processing service
 - Realize multiple input streams to one output through automatic addressing
 - Built-in Nginx cache to reduce the load on the server as much as possible to avoid thundering herd problem
@@ -74,8 +77,11 @@ Video live streaming, transcoding, recording, fragmentation and other functions,
 
 **Demo Web page**
 **Note that this web page is for demonstration purposes only, solution WILL NOT create such web page by default unless explicit configured in CloudFormation parameter**
+
 ![console](./images/console.png)
+
 Function of demo web page include:
+
 - Domain configuration
 - Live streaming managment
 - Video recording
@@ -86,6 +92,7 @@ Function of demo web page include:
 ## Installation & Deployment：
 
 **Prerequisite**
+
 - Make sure you have a domain name registered by ICP，click[**here**](https://www.amazonaws.cn/support/icp/?nc1=h_ls) to understand how to file for ICP
 
 Click [**Here**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml) to jump Amazon CloudFormation console (Beijing), click Next to deploy
@@ -98,25 +105,20 @@ Click Next to configure the deployment options. InstallDemoConsole configures wh
 
 - Step1, obtain the SSL certificate corresponding to your domain name
 install certbot，execute command below (for mac user)
-
 ```
 brew install certbot
 sudo certbot certonly --manual --preferred-challenges dns -d "*.<your domain prefix>.aws.a2z.org.cn"
 ```
-
 After execution, the console prompts similar information as follows:
-
 ```
 Please deploy a DNS TXT record under the name
 _acme-challenge.<your domain prefix>.aws.a2z.org.cn with the following value:
 
 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****
-
 ```
 following instruction “_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****” to add the corresponding string to the domain name record you manage, and then click confirm. You will get the signed certificate. The mac user certificate is stored in the /etc/letsencrypt/live/ directory
 
 - Step2, upload SSL certificate to IAM
-
 ```
 sudo aws iam upload-server-certificate \
 --path '/cloudfront/' \
@@ -128,11 +130,9 @@ sudo aws iam upload-server-certificate \
 ```
 
 - Step3, open CloudFront console, find your distribution，then click General -> Edit -> Custom SSL Certificate (example.com) in "SSL Certificate” -> choose the SSL certificate you upload in previous step
-
 ![edit-cloudfront](./images/edit-cloudfront.png)
 
 - Step4, open EC2 console and click Load Balancer，find Load Balancer with prefix origin，then click Add listener -> Default SSL certificate -> choose the SSL certificate you upload in previous step
-
 ![edit-elb-1](./images/edit-elb-1.png)
 ![edit-elb-2](./images/edit-elb-2.png)
 
@@ -170,7 +170,6 @@ The above string is spliced ​​in the following format and used as the stream
 ```
 
 **Example as follows**
-
 ```
 70ef9b07-adbe-478d-b098-d7c8efd84a98?sign=1670371200-5db080c8cdca8764de881bc04e61e2b1
 ```
@@ -183,10 +182,10 @@ rtmp://<LiveVideoPushStreamURL>/stream/98724e64-bcd1-4887-af4a-60be440709aa?sign
 ```
 
 Configure corresponding streaming software e.g. OBS to push video stream
-
 ![obs](./images/obs.png)
 
 Other configurations are shown below:
+
 - Encoder: x264
 - Rate Control: CBR
 - Bit Rate：1000 (or lower)
@@ -211,6 +210,7 @@ Get the management console address, push/pull stream address, and pull stream do
 ![cloudformation-output](./images/cloudformation-output.png)
 
 Log in to console address, click on the upper right corner of "Live Channel" + to create a channel, and then do the following:
+
 - Enter channel name, description and expiration time
 - Select the video output format, for example: HLS, FLV, CMAF
 - Platform will automatically generates a signatured push address based on the domain name and expiration time
@@ -220,6 +220,7 @@ Log in to console address, click on the upper right corner of "Live Channel" + t
 **Get video push address and playback address**
 
 Follow steps below：
+
 - Click the arrow button to automatically generate the push stream address and playback address
 - Automatically generate signature push address and push QR code based on expiration time and private key
 - Automatically generate HLS, FLV, CMAF streaming addresses
@@ -229,6 +230,7 @@ Follow steps below：
 **Preview live streaming**
 
 Follow steps below：
+
 - Click the avatar button to display details
 - Auto generated video stream playback address and QR code are displayed
 - Preview will displayed according to different video output formats
@@ -237,6 +239,7 @@ Follow steps below：
 **Video Recording**
 
 To record and screenshot live video streaming according configured parameters, follow steps below:
+
 - Click switch button turn on corresponding function
 - Support JPG, MP4 and HLS output format
 - Assetes store in auto created S3 bucket
@@ -247,6 +250,7 @@ To record and screenshot live video streaming according configured parameters, f
 **Video Watchmark**
 
 Add pictures, icons or texts to original streaming video screen, including the following functions:
+
 - Support picture pictures, icons and texts
 - Configurable parameter including watermark position, size, text and text attributes
 - Picture watermark parameters: picture URL address, picture height, width, left and right spacing
@@ -256,6 +260,7 @@ Add pictures, icons or texts to original streaming video screen, including the f
 **Video Transcoding**
 
 Transcode pushed live stream into a video stream with multiple resolutions and bitrate specifications, functions include:
+
 - Adapt to different playback terminals; adapt to different network environments; reduce distribution costs
 - Pre-built transcoding template: 4 commonly used templates for smooth, SD, HD and ultra-definition
 
@@ -273,6 +278,7 @@ The resolution and bit rate of the transcoding template are as follows:
 **Video Relay**
 
 Relay and forward video streams, including following functions:
+
 - Automatically push the original video stream to other live video platforms through such video relay
 - Synchronous live streaming with native & overseas 
 

@@ -521,31 +521,39 @@ High-performance and lightweight RTMP server based on Node media server, support
 <p><strong>Meta Data Management</strong>
 Use DynamoDB to manage metadata of video stream, and provide Restful API of CRUD management of metadata through the API gateway; Dynamically configure video stream processing parameters; Auto generate a unique video push channel; Fetch video push &amp; pull URLs through the API</p>
 <p><strong>Video Processing</strong>
-Video live streaming, transcoding, recording, fragmentation and other functions based on Fargate, including:
-- High performance ngnix http server
-- Video real time encoding &amp; transcoding
-- Video &amp; image fragmentation and S3 storagem, customized fragmentation time and transcoding parameters
-- Suppoer HTTP-FLV (2s delay) and HLS/CMAF (10s delay)
-- Adjust parameter dynamically, seamless integrate with Amazon services</p>
+Video live streaming, transcoding, recording, fragmentation and other functions based on Fargate, including:</p>
+<ul>
+<li>High performance ngnix http server</li>
+<li>Video real time encoding &amp; transcoding</li>
+<li>Video &amp; image fragmentation and S3 storagem, customized fragmentation time and transcoding parameters</li>
+<li>Suppoer HTTP-FLV (2s delay) and HLS/CMAF (10s delay)</li>
+<li>Adjust parameter dynamically, seamless integrate with Amazon services</li>
+</ul>
 <p><strong>Video Distribution</strong>
-Channel addressing and video acceleration based on Fargate and CloudFront, including:
-- Video distribution cluster management, video stream pulling path：Route53-&gt; CloudFront-&gt; ALB-&gt; video distribution service-&gt; video processing service
-- Realize multiple input streams to one output through automatic addressing
-- Built-in Nginx cache to reduce the load on the server as much as possible to avoid thundering herd problem
-- Using CloudFront to optimize the downstream experience and secure video access through signed URL</p>
+Channel addressing and video acceleration based on Fargate and CloudFront, including:</p>
+<ul>
+<li>Video distribution cluster management, video stream pulling path：Route53-&gt; CloudFront-&gt; ALB-&gt; video distribution service-&gt; video processing service</li>
+<li>Realize multiple input streams to one output through automatic addressing</li>
+<li>Built-in Nginx cache to reduce the load on the server as much as possible to avoid thundering herd problem</li>
+<li>Using CloudFront to optimize the downstream experience and secure video access through signed URL</li>
+</ul>
 <p><strong>Demo Web page</strong>
 <strong>Note that this web page is for demonstration purposes only, solution WILL NOT create such web page by default unless explicit configured in CloudFormation parameter</strong>
 <img alt="console" src="images/console.png" />
-Function of demo web page include:
-- Domain configuration
-- Live streaming managment
-- Video recording
-- Watermark configuration
-- Video Relay
-- VoD</p>
+Function of demo web page include:</p>
+<ul>
+<li>Domain configuration</li>
+<li>Live streaming managment</li>
+<li>Video recording</li>
+<li>Watermark configuration</li>
+<li>Video Relay</li>
+<li>VoD</li>
+</ul>
 <h2 id="installation-deployment">Installation &amp; Deployment：</h2>
-<p><strong>Prerequisite</strong>
-- Make sure you have a domain name registered by ICP，click<a href="https://www.amazonaws.cn/support/icp/?nc1=h_ls"><strong>here</strong></a> to understand how to file for ICP</p>
+<p><strong>Prerequisite</strong></p>
+<ul>
+<li>Make sure you have a domain name registered by ICP，click<a href="https://www.amazonaws.cn/support/icp/?nc1=h_ls"><strong>here</strong></a> to understand how to file for ICP</li>
+</ul>
 <p>Click <a href="https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&amp;templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml"><strong>Here</strong></a> to jump Amazon CloudFormation console (Beijing), click Next to deploy</p>
 <p><img alt="console-snapshot" src="images/console-snapshot.png" /></p>
 <p>Click Next to configure the deployment options. InstallDemoConsole configures whether to deploy the user demo web interface, default value is false. CNAME configures the CNAMEs associated with CloudFront. ZHY/BJS region users need to use the registered domain name for association. Overseas users do not have such requirement, default value is www.example.cn</p>
@@ -612,13 +620,15 @@ After obtaining the streaming URL from the CloudFormation console, splice the RT
 </code></pre>
 <p>Configure corresponding streaming software e.g. OBS to push video stream
 <img alt="obs" src="images/obs.png" /></p>
-<p>Other configurations are shown below:
-- Encoder: x264
-- Rate Control: CBR
-- Bit Rate：1000 (or lower)
-- Key Frame Gap（Second，0=Auto）：2
-- CPU Usage Preset (higher = less CPU) ：veryfast， 
-- Tune：zerolatency</p>
+<p>Other configurations are shown below:</p>
+<ul>
+<li>Encoder: x264</li>
+<li>Rate Control: CBR</li>
+<li>Bit Rate：1000 (or lower)</li>
+<li>Key Frame Gap（Second，0=Auto）：2</li>
+<li>CPU Usage Preset (higher = less CPU) ：veryfast， </li>
+<li>Tune：zerolatency</li>
+</ul>
 <p>View video through video player (ffplayer) or browser</p>
 <pre><code>ffplay http://&lt;LiveVideoPullStreamURL&gt;/98724e64-bcd1-4887-af4a-60be440709aa/live.flv
 
@@ -628,40 +638,50 @@ http://&lt;LiveVideoPullStreamURL&gt;/98724e64-bcd1-4887-af4a-60be440709aa/flv.h
 <p><strong>Note that this web page is for demonstration purposes only, solution WILL NOT create such web page by default unless explicit configured in CloudFormation parameter</strong></p>
 <p>Get the management console address, push/pull stream address, and pull stream domain name from the CloudFormation console output panel, </p>
 <p><img alt="cloudformation-output" src="images/cloudformation-output.png" /></p>
-<p>Log in to console address, click on the upper right corner of "Live Channel" + to create a channel, and then do the following:
-- Enter channel name, description and expiration time
-- Select the video output format, for example: HLS, FLV, CMAF
-- Platform will automatically generates a signatured push address based on the domain name and expiration time</p>
+<p>Log in to console address, click on the upper right corner of "Live Channel" + to create a channel, and then do the following:</p>
+<ul>
+<li>Enter channel name, description and expiration time</li>
+<li>Select the video output format, for example: HLS, FLV, CMAF</li>
+<li>Platform will automatically generates a signatured push address based on the domain name and expiration time</li>
+</ul>
 <p><img alt="create-channel" src="images/create-channel.png" /></p>
 <p><strong>Get video push address and playback address</strong></p>
-<p>Follow steps below：
-- Click the arrow button to automatically generate the push stream address and playback address
-- Automatically generate signature push address and push QR code based on expiration time and private key
-- Automatically generate HLS, FLV, CMAF streaming addresses</p>
+<p>Follow steps below:</p>
+<ul>
+<li>Click the arrow button to automatically generate the push stream address and playback address</li>
+<li>Automatically generate signature push address and push QR code based on expiration time and private key</li>
+<li>Automatically generate HLS, FLV, CMAF streaming addresses</li>
+</ul>
 <p><img alt="get-address" src="images/get-address.png" /></p>
 <p><strong>Preview live streaming</strong></p>
-<p>Follow steps below：
+<p>Follow steps below:
 - Click the avatar button to display details
 - Auto generated video stream playback address and QR code are displayed
 - Preview will displayed according to different video output formats
 - It takes about 35 seconds to see the live streaming online after initial push</p>
 <p><strong>Video Recording</strong></p>
-<p>To record and screenshot live video streaming according configured parameters, follow steps below:
-- Click switch button turn on corresponding function
-- Support JPG, MP4 and HLS output format
-- Assetes store in auto created S3 bucket
-- Set suitable snapshot &amp; record frequency for optimized cost</p>
+<p>To record and screenshot live video streaming according configured parameters, follow steps below:</p>
+<ul>
+<li>Click switch button turn on corresponding function</li>
+<li>Support JPG, MP4 and HLS output format</li>
+<li>Assetes store in auto created S3 bucket</li>
+<li>Set suitable snapshot &amp; record frequency for optimized cost</li>
+</ul>
 <p><img alt="record" src="images/record.png" /></p>
 <p><strong>Video Watchmark</strong></p>
-<p>Add pictures, icons or texts to original streaming video screen, including the following functions:
-- Support picture pictures, icons and texts
-- Configurable parameter including watermark position, size, text and text attributes
-- Picture watermark parameters: picture URL address, picture height, width, left and right spacing</p>
+<p>Add pictures, icons or texts to original streaming video screen, including the following functions:</p>
+<ul>
+<li>Support picture pictures, icons and texts</li>
+<li>Configurable parameter including watermark position, size, text and text attributes</li>
+<li>Picture watermark parameters: picture URL address, picture height, width, left and right spacing</li>
+</ul>
 <p><img alt="watermark" src="images/watermark.png" /></p>
 <p><strong>Video Transcoding</strong></p>
-<p>Transcode pushed live stream into a video stream with multiple resolutions and bitrate specifications, functions include:
-- Adapt to different playback terminals; adapt to different network environments; reduce distribution costs
-- Pre-built transcoding template: 4 commonly used templates for smooth, SD, HD and ultra-definition</p>
+<p>Transcode pushed live stream into a video stream with multiple resolutions and bitrate specifications, functions include:</p>
+<ul>
+<li>Adapt to different playback terminals; adapt to different network environments; reduce distribution costs</li>
+<li>Pre-built transcoding template: 4 commonly used templates for smooth, SD, HD and ultra-definition</li>
+</ul>
 <p>The resolution and bit rate of the transcoding template are as follows:</p>
 <table>
 <thead>
@@ -701,9 +721,11 @@ http://&lt;LiveVideoPullStreamURL&gt;/98724e64-bcd1-4887-af4a-60be440709aa/flv.h
 </table>
 <p><img alt="codec" src="images/codec.png" /></p>
 <p><strong>Video Relay</strong></p>
-<p>Relay and forward video streams, including following functions:
-- Automatically push the original video stream to other live video platforms through such video relay
-- Synchronous live streaming with native &amp; overseas </p>
+<p>Relay and forward video streams, including following functions:</p>
+<ul>
+<li>Automatically push the original video stream to other live video platforms through such video relay</li>
+<li>Synchronous live streaming with native &amp; overseas </li>
+</ul>
 <h2 id="security">Security</h2>
 <p>See <a href="CONTRIBUTING.md#security-issue-notifications">CONTRIBUTING</a> for more information.</p>
 <h2 id="license">License</h2>

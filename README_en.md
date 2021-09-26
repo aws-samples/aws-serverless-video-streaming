@@ -77,9 +77,7 @@ Channel addressing and video acceleration based on Fargate and CloudFront, inclu
 
 **Demo Web page**
 **Note that this web page is for demonstration purposes only, solution WILL NOT create such web page by default unless explicit configured in CloudFormation parameter**
-
 ![console](./images/console.png)
-
 Function of demo web page include:
 
 - Domain configuration
@@ -114,11 +112,12 @@ After execution, the console prompts similar information as follows:
 Please deploy a DNS TXT record under the name
 _acme-challenge.<your domain prefix>.aws.a2z.org.cn with the following value:
 
-8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****
+8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx
 ```
-following instruction “_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****” to add the corresponding string to the domain name record you manage, and then click confirm. You will get the signed certificate. The mac user certificate is stored in the /etc/letsencrypt/live/ directory
+following instruction “_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx” to add the corresponding string to the domain name record you manage, and then click confirm. You will get the signed certificate. The mac user certificate is stored in the /etc/letsencrypt/live/ directory
 
 - Step2, upload SSL certificate to IAM
+
 ```
 sudo aws iam upload-server-certificate \
 --path '/cloudfront/' \
@@ -219,7 +218,7 @@ Log in to console address, click on the upper right corner of "Live Channel" + t
 
 **Get video push address and playback address**
 
-Follow steps below：
+Follow steps below:
 
 - Click the arrow button to automatically generate the push stream address and playback address
 - Automatically generate signature push address and push QR code based on expiration time and private key
@@ -229,8 +228,7 @@ Follow steps below：
 
 **Preview live streaming**
 
-Follow steps below：
-
+Follow steps below:
 - Click the avatar button to display details
 - Auto generated video stream playback address and QR code are displayed
 - Preview will displayed according to different video output formats

@@ -530,30 +530,38 @@ SPDX-License-Identifier: MIT-0 License
 <p><strong>元数据管理：</strong>
 使用dynamodb管理视频流元数据，通过API gateway提供元数据的CRUD管理的Restful API；动态设置视频流处理参数；自动生成唯一推流channel;通过API得到推流和拉流URL</p>
 <p><strong>视频处理服务</strong>
-基于Fargate实现视频转码，直播，录制，分片等功能，包括：
-- 高性能，基于Ngnix HTTP server
-- 视频流进行实时编码，转码
-- 视频和图片分片和S3存储，自定义分片时间和转码参数，
-- 支持HTTP-FLV（2秒延迟）和HLS\CMAF（10秒延迟）
-- 动态调整参数，轻松与Amazon服务集成</p>
+基于Fargate实现视频转码，直播，录制，分片等功能，包括：</p>
+<ul>
+<li>高性能，基于Ngnix HTTP server</li>
+<li>视频流进行实时编码，转码</li>
+<li>视频和图片分片和S3存储，自定义分片时间和转码参数，</li>
+<li>支持HTTP-FLV（2秒延迟）和HLS\CMAF（10秒延迟）</li>
+<li>动态调整参数，轻松与Amazon服务集成</li>
+</ul>
 <p><strong>视频分发服务</strong>
-基于Fargate和CloudFront实现频道寻址，视频加速，包括：
-- 视频流分发底层服务的弹性伸缩
-- 通过自动寻址实现多路输入流到一路输出
-- 内置Nginx缓存，尽可能减少服务器上的负载，避免惊群效应
-- 利用CloudFront优化下行拉流体验，通过signed URL实现视频的安全访问</p>
-<p><strong>演示web：注意该web界面仅作演示用途，默认方案不会创建该web界面，需要在CloudFormation中的参数显式指定</strong>
-<img alt="console" src="images/console.png" />
-演示web功能包括：
-- 域名配置
-- 直播管理
-- 视频录制
-- 水印配置
-- 视频中继
-- 在线视频</p>
+基于Fargate和CloudFront实现频道寻址，视频加速，包括：</p>
+<ul>
+<li>视频流分发底层服务的弹性伸缩</li>
+<li>通过自动寻址实现多路输入流到一路输出</li>
+<li>内置Nginx缓存，尽可能减少服务器上的负载，避免惊群效应</li>
+<li>利用CloudFront优化下行拉流体验，通过signed URL实现视频的安全访问</li>
+</ul>
+<p><strong>演示web：注意该web界面仅作演示用途，默认方案不会创建该web界面，需要在CloudFormation中的参数显式指定</strong></p>
+<p><img alt="console" src="images/console.png" /></p>
+<p>演示web功能包括：</p>
+<ul>
+<li>域名配置</li>
+<li>直播管理</li>
+<li>视频录制</li>
+<li>水印配置</li>
+<li>视频中继</li>
+<li>在线视频</li>
+</ul>
 <h2 id="_6">安装与部署：</h2>
-<p><strong>先决条件：</strong>
-- 确保您有ICP备案的域名，点击<a href="https://www.amazonaws.cn/support/icp/?nc1=h_ls"><strong>这里</strong></a>了解如何进行ICP备案。</p>
+<p><strong>先决条件：</strong></p>
+<ul>
+<li>确保您有ICP备案的域名，点击<a href="https://www.amazonaws.cn/support/icp/?nc1=h_ls"><strong>这里</strong></a>了解如何进行ICP备案。</li>
+</ul>
 <p>点击<a href="https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&amp;templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml"><strong>这里</strong></a>跳转到对应的Amazon CloudFormation控制台（北京），点击下一步进行部署</p>
 <p><img alt="console-snapshot" src="images/console-snapshot.png" /></p>
 <p>点击下一步进行部署选项配置，其中InstallDemoConsole配置是否部署用户演示的web界面，默认为false，CNAME配置CloudFront所关联的CNAMEs，大陆用户需要使用备案域名进行关联，海外用户无此要求，默认为www.example.cn</p>
@@ -569,9 +577,9 @@ sudo certbot certonly --manual --preferred-challenges dns -d &quot;*.&lt;your do
 <pre><code>Please deploy a DNS TXT record under the name
 _acme-challenge.&lt;your domain prefix&gt;.aws.a2z.org.cn with the following value:
 
-8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx
+8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****
 </code></pre>
-<p>按照提示“_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-xxxx”将对应字符串添加到您管理的域名记录中，然后点击确认您将获取到签名证书，mac用户证书存放在/etc/letsencrypt/live/目录下</p>
+<p>按照提示“_acme-challenge.<your domain prefix>.aws.a2z.org.cn Route 53 TXT type entry and set the value to 8ZCAA6XvwLKK3MiGLRufX1p0_gIHnT-****”将对应字符串添加到您管理的域名记录中，然后点击确认您将获取到签名证书，mac用户证书存放在/etc/letsencrypt/live/目录下</p>
 <ul>
 <li>步骤二，上传SSL证书到IAM</li>
 </ul>
@@ -622,13 +630,15 @@ _acme-challenge.&lt;your domain prefix&gt;.aws.a2z.org.cn with the following val
 </code></pre>
 <p>配置对应的推流软件如OBS来进行视频推送
 <img alt="obs" src="images/obs.png" /></p>
-<p>其他配置如下所示：
-- 编码器：x264
-- 速率控制：CBR
-- 比特率：1000 (或更低)
-- 关键帧间隔（秒，0=自动）：2
-- CPU Usage Preset (higher = less CPU) ：veryfast， 
-- Tune：zerolatency</p>
+<p>其他配置如下所示：</p>
+<ul>
+<li>编码器：x264</li>
+<li>速率控制：CBR</li>
+<li>比特率：1000 (或更低)</li>
+<li>关键帧间隔（秒，0=自动）：2</li>
+<li>CPU Usage Preset (higher = less CPU) ：veryfast， </li>
+<li>Tune：zerolatency</li>
+</ul>
 <p>通过视频播放器（ffplayer）或浏览器查看视频</p>
 <pre><code>ffplay http://&lt;LiveVideoPullStreamURL&gt;/98724e64-bcd1-4887-af4a-60be440709aa/live.flv
 
@@ -639,43 +649,55 @@ http://&lt;LiveVideoPullStreamURL&gt;/98724e64-bcd1-4887-af4a-60be440709aa/flv.h
 <p><strong>创建直播频道</strong></p>
 <p>从CloudFormation控制台输出面板中，获取直播控制台地址，推流/拉流地址，拉流域名。</p>
 <p><img alt="cloudformation-output" src="images/cloudformation-output.png" /></p>
-<p>登陆进入直播控制台地址，点击“直播频道”右上角+创建直播频道，然后按照如下操作：
-- 输入直播频道名称，描述和过期时间
-- 选择视频输出格式，例如：HLS，FLV，CMAF
-- 系统自动根据域名和过期时间生成签名推流地址</p>
+<p>登陆进入直播控制台地址，点击“直播频道”右上角+创建直播频道，然后按照如下操作：</p>
+<ul>
+<li>输入直播频道名称，描述和过期时间</li>
+<li>选择视频输出格式，例如：HLS，FLV，CMAF</li>
+<li>系统自动根据域名和过期时间生成签名推流地址</li>
+</ul>
 <p><img alt="create-channel" src="images/create-channel.png" /></p>
 <p><strong>获取推流地址和播放地址</strong></p>
-<p>按照如下步骤操作：
-- 点击箭头按钮，自动生成推流地址和播放地址
-- 自动根据过期时间和私钥生成签名推流地址和推流二维码
-- 自动生成HLS，FLV，CMAF拉流地址
-- 点击对应输出的播放按钮，播放视频</p>
+<p>按照如下步骤操作：</p>
+<ul>
+<li>点击箭头按钮，自动生成推流地址和播放地址</li>
+<li>自动根据过期时间和私钥生成签名推流地址和推流二维码</li>
+<li>自动生成HLS，FLV，CMAF拉流地址</li>
+<li>点击对应输出的播放按钮，播放视频</li>
+</ul>
 <p><img alt="get-address" src="images/get-address.png" /></p>
 <p><strong>在线预览直播视频流</strong></p>
-<p>按照如下步骤操作：
-- 点击头像 按钮，显示直播视频浏览
-- 自动生成视频流播放地址和二维码
-- 根据不同的视频输出格式在线预览
-- 直播推流成功后，大概需要35秒左右可在线看到直播流</p>
+<p>按照如下步骤操作：</p>
+<ul>
+<li>点击头像 按钮，显示直播视频浏览</li>
+<li>自动生成视频流播放地址和二维码</li>
+<li>根据不同的视频输出格式在线预览</li>
+<li>直播推流成功后，大概需要35秒左右可在线看到直播流</li>
+</ul>
 <p><strong>直播视频录制</strong></p>
-<p>根据配置的录制规则对正在直播的视频进行录制和截图，按照如下步骤操作：
-- 操作：点击修改按钮，修改直播视频录制的参数
-- 录制格式：录制文件的格式，支持“JPG”“MP4”和”HLS”格式
-- 存储位置:存储在自动生成的S3存储桶中（video-streaming-assets-assetsbucket开头）
-- 参数：截图频率，MP4录制频率，HLS录制频率
-- 任务类型：灵活选择转码任务类型，节省成本</p>
+<p>根据配置的录制规则对正在直播的视频进行录制和截图，按照如下步骤操作：</p>
+<ul>
+<li>操作：点击修改按钮，修改直播视频录制的参数</li>
+<li>录制格式：录制文件的格式，支持“JPG”“MP4”和”HLS”格式</li>
+<li>存储位置:存储在自动生成的S3存储桶中（video-streaming-assets-assetsbucket开头）</li>
+<li>参数：截图频率，MP4录制频率，HLS录制频率</li>
+<li>任务类型：灵活选择转码任务类型，节省成本</li>
+</ul>
 <p><img alt="record" src="images/record.png" /></p>
 <p><strong>直播水印</strong></p>
-<p>原始流视频画面添加上各种预设好的标志图片和文字，包括如下功能：
-- 支持图片水印和文字水印
-- 主要参数：包括水印位置和水印大小 ，文字及文字属性
-- 图片水印参数：图片URL地址，图片高度，图片宽度，左右间距</p>
+<p>原始流视频画面添加上各种预设好的标志图片和文字，包括如下功能：</p>
+<ul>
+<li>支持图片水印和文字水印</li>
+<li>主要参数：包括水印位置和水印大小 ，文字及文字属性</li>
+<li>图片水印参数：图片URL地址，图片高度，图片宽度，左右间距</li>
+</ul>
 <p><img alt="watermark" src="images/watermark.png" /></p>
 <p><strong>直播视频转码：</strong></p>
-<p>将推送的直播流转码成多种分辨率和码率规格的视频流，包括如下功能：
-- 适配不同播放终端；适配不同网络环境；降低分发成本
-- 预置转码模板：支持选择视频画质，视频画质内置了常用的流畅，标清，高清和超清四种标准模板
-- 任务类型：灵活选择转码任务类型，节省成本</p>
+<p>将推送的直播流转码成多种分辨率和码率规格的视频流，包括如下功能：</p>
+<ul>
+<li>适配不同播放终端；适配不同网络环境；降低分发成本</li>
+<li>预置转码模板：支持选择视频画质，视频画质内置了常用的流畅，标清，高清和超清四种标准模板</li>
+<li>任务类型：灵活选择转码任务类型，节省成本</li>
+</ul>
 <p>转码模板的分辨率和码率如下所示：</p>
 <table>
 <thead>
@@ -715,9 +737,11 @@ http://&lt;LiveVideoPullStreamURL&gt;/98724e64-bcd1-4887-af4a-60be440709aa/flv.h
 </table>
 <p><img alt="codec" src="images/codec.png" /></p>
 <p><strong>直播中继：</strong></p>
-<p>在直播视频流中继转发，包括如下功能：
-- 通过视频relay自动把原始视频流推送到其他视频直播平台
-- 实现国内和海外同步直播</p>
+<p>在直播视频流中继转发，包括如下功能：</p>
+<ul>
+<li>通过视频relay自动把原始视频流推送到其他视频直播平台</li>
+<li>实现国内和海外同步直播</li>
+</ul>
 <p><img alt="relay" src="images/relay.png" /></p>
 <h2 id="security">Security</h2>
 <p>See <a href="CONTRIBUTING.md#security-issue-notifications">CONTRIBUTING</a> for more information.</p>

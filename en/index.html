@@ -12,7 +12,7 @@
         <link rel="canonical" href="https://example.com/">
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.3.0">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
     
     
       
@@ -20,7 +20,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.8b42a75e.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.a57b2b03.min.css">
       
         
         <link rel="stylesheet" href="assets/stylesheets/palette.3f5d1f46.min.css">
@@ -255,6 +255,8 @@
       </a>
       
         
+
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -364,6 +366,8 @@
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
+
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -556,7 +560,7 @@ Function of demo web page include:</p>
 </ul>
 <p>Click <a href="https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&amp;templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml"><strong>Here</strong></a> to jump Amazon CloudFormation console (Beijing), click Next to deploy</p>
 <p><img alt="console-snapshot" src="images/console-snapshot.png" /></p>
-<p>Click Next to configure the deployment options. InstallDemoConsole configures whether to deploy the user demo web interface, default value is false. CNAME configures the CNAMEs associated with CloudFront. ZHY/BJS region users need to use the registered domain name for association. Overseas users do not have such requirement, default value is www.example.cn</p>
+<p>Click Next to configure the deployment options. InstallDemoConsole configures whether to deploy the user demo web interface, default value is false. CNAME configures the CNAMEs associated with CloudFront. ZHY/BJS region users need to use the registered domain name for association otherwise you may not access your distribution normally. Overseas users do not have such requirement, default value is www.example.cn. You need to choose at least two availability zones to create new VPC network for network configuration. Also note the maximum length of stack name is 128 characters, we recommend to use shorter stack name such as: LiveStream.</p>
 <p>[<strong>optional</strong>]After the solution is deployed, if you want to distribute video streams via HTTPS to further enhance security, you can follow the steps below to additionally configure your CloudFront and Elastic Load Balancer services</p>
 <ul>
 <li>Step1, obtain the SSL certificate corresponding to your domain name
@@ -598,10 +602,39 @@ _acme-challenge.&lt;your domain prefix&gt;.aws.a2z.org.cn with the following val
 <p>The solution uses the RESTFul API provided by API Gateway to manage video channel metadata and integrate it into existing application and management interface. After the solution is deployed, navigate to the nest stack prefixed with VideoMetadata, and check the output option to obtain the URL address created by API Gateway.</p>
 <p><img alt="metadata-output" src="images/metadata-output.png" /></p>
 <p>POST the URL address through tools such as Curl or Postman to create a live channel, where the main content of the request is as follows</p>
-<pre><code>{&quot;isFlv&quot;:true, &quot;isHls&quot;:true, &quot;isVideo&quot;:false, &quot;isImage&quot;:true, &quot;isMotion&quot;:false, &quot;isOnDemand&quot;:false, &quot;isCMAF&quot;:false, &quot;video_time&quot;:&quot;60&quot;, &quot;image_time&quot;:&quot;30&quot;, &quot;hls_time&quot;:&quot;2&quot;, &quot;hls_list_size&quot;:&quot;5&quot;, &quot;outdate&quot;:&quot;2022-12-09&quot;}
+<pre><code>{
+    &quot;isFlv&quot;:true, 
+    &quot;isHls&quot;:true, 
+    &quot;isVideo&quot;:false, 
+    &quot;isImage&quot;:true, 
+    &quot;isMotion&quot;:false, 
+    &quot;isOnDemand&quot;:false, 
+    &quot;isCMAF&quot;:false, 
+    &quot;video_time&quot;:&quot;60&quot;, 
+    &quot;image_time&quot;:&quot;30&quot;, 
+    &quot;hls_time&quot;:&quot;2&quot;, 
+    &quot;hls_list_size&quot;:&quot;5&quot;, 
+    &quot;outdate&quot;:&quot;2022-12-09&quot;
+}
 </code></pre>
 <p>create live channel by Curl</p>
-<pre><code>curl -d '{&quot;isFlv&quot;:true, &quot;isHls&quot;:false, &quot;isVideo&quot;:true, &quot;isImage&quot;:false, &quot;isMotion&quot;:false, &quot;isOnDemand&quot;:false, &quot;isCMAF&quot;:false, &quot;video_time&quot;:&quot;60&quot;, &quot;image_time&quot;:&quot;30&quot;, &quot;hls_time&quot;:&quot;2&quot;, &quot;hls_list_size&quot;:&quot;5&quot;, &quot;outdate&quot;:&quot;2022-12-09&quot;}' -H &quot;Content-Type: application/json&quot; -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
+<pre><code>curl -d
+'{
+    &quot;isFlv&quot;:true, 
+    &quot;isHls&quot;:false, 
+    &quot;isVideo&quot;:true, 
+    &quot;isImage&quot;:false, 
+    &quot;isMotion&quot;:false, 
+    &quot;isOnDemand&quot;:false, 
+    &quot;isCMAF&quot;:false, 
+    &quot;video_time&quot;:&quot;60&quot;, 
+    &quot;image_time&quot;:&quot;30&quot;, 
+    &quot;hls_time&quot;:&quot;2&quot;, 
+    &quot;hls_list_size&quot;:&quot;5&quot;, 
+    &quot;outdate&quot;:&quot;2022-12-09&quot;
+}' 
+-H &quot;Content-Type: application/json&quot; 
+-X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
 </code></pre>
 <p>Create a live channel through Thunder Client. After the creation is successful, you will get the corresponding return information</p>
 <p><img alt="metadata-create" src="images/metadata-create.png" /></p>
@@ -767,10 +800,10 @@ http://&lt;LiveVideoPullStreamURL&gt;/98724e64-bcd1-4887-af4a-60be440709aa/flv.h
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": ".", "features": ["tabs", "search.suggest", "search.highlight"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.f8263e09.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": ["tabs", "search.suggest", "search.highlight"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.fcfe8b6d.min.js", "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.4fc53ad4.min.js"></script>
+      <script src="assets/javascripts/bundle.b1047164.min.js"></script>
       
     
   </body>

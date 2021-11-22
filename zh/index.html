@@ -12,7 +12,7 @@
         <link rel="canonical" href="https://example.com/">
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.3.0">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
     
     
       
@@ -20,7 +20,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.8b42a75e.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.a57b2b03.min.css">
       
         
         <link rel="stylesheet" href="assets/stylesheets/palette.3f5d1f46.min.css">
@@ -255,6 +255,8 @@
       </a>
       
         
+
+
 <nav class="md-nav md-nav--secondary" aria-label="目录">
   
   
@@ -379,6 +381,8 @@
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
+
+
 <nav class="md-nav md-nav--secondary" aria-label="目录">
   
   
@@ -564,7 +568,7 @@ SPDX-License-Identifier: MIT-0 License
 </ul>
 <p>点击<a href="https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=AWSVideoStreamingPlatform&amp;templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/serverless-video-streaming/v1.0.0/aws-serverless-video-streaming.main.template.yaml"><strong>这里</strong></a>跳转到对应的Amazon CloudFormation控制台（北京），点击下一步进行部署</p>
 <p><img alt="console-snapshot" src="images/console-snapshot.png" /></p>
-<p>点击下一步进行部署选项配置，其中InstallDemoConsole配置是否部署用户演示的web界面，默认为false，CNAME配置CloudFront所关联的CNAMEs，大陆用户需要使用备案域名进行关联，海外用户无此要求，默认为www.example.cn</p>
+<p>点击下一步进行部署选项配置，其中InstallDemoConsole配置是否部署用户演示的web界面，默认为false，CNAME配置CloudFront所关联的CNAMEs，大陆用户需要使用备案域名进行关联，否则会导致您的域名无法访问，海外用户无此要求，默认为www.example.cn。网络配置部分，您需要最少选择两个可用区以进行VPC网络的创建。最后需要注意栈名称的最大长度为128个字符，我们建议您使用较短的名称进行命名，比如：LiveStream。</p>
 <p>[<strong>可选</strong>]在方案部署完毕之后，如果您希望通过HTTPS方式分发视频流以进一步增强安全性，则可以按照下列步骤来额外配置您的CloudFront和Elastic Load Balancer服务</p>
 <ul>
 <li>步骤一，获取您域名对应的SSL证书
@@ -606,10 +610,39 @@ _acme-challenge.&lt;your domain prefix&gt;.aws.a2z.org.cn with the following val
 <p>方案通过API Gateway提供的Restful API来对视频频道的元数据进行管理并集成到自己的应用和管理界面中。在方案部署完毕之后，跳转到前缀为VideoMetadata的nest stack，查看output选项以获取所创建的API Gateway的URL地址。</p>
 <p><img alt="metadata-output" src="images/metadata-output.png" /></p>
 <p>通过Curl或者Postman等工具对该URL地址进行POST操作以创建直播频道，其中request的主体内容如下所示</p>
-<pre><code>{&quot;isFlv&quot;:true, &quot;isHls&quot;:true, &quot;isVideo&quot;:false, &quot;isImage&quot;:true, &quot;isMotion&quot;:false, &quot;isOnDemand&quot;:false, &quot;isCMAF&quot;:false, &quot;video_time&quot;:&quot;60&quot;, &quot;image_time&quot;:&quot;30&quot;, &quot;hls_time&quot;:&quot;2&quot;, &quot;hls_list_size&quot;:&quot;5&quot;, &quot;outdate&quot;:&quot;2022-12-09&quot;}
+<pre><code>{
+    &quot;isFlv&quot;:true, 
+    &quot;isHls&quot;:true, 
+    &quot;isVideo&quot;:false, 
+    &quot;isImage&quot;:true, 
+    &quot;isMotion&quot;:false, 
+    &quot;isOnDemand&quot;:false, 
+    &quot;isCMAF&quot;:false, 
+    &quot;video_time&quot;:&quot;60&quot;, 
+    &quot;image_time&quot;:&quot;30&quot;, 
+    &quot;hls_time&quot;:&quot;2&quot;, 
+    &quot;hls_list_size&quot;:&quot;5&quot;, 
+    &quot;outdate&quot;:&quot;2022-12-09&quot;
+}
 </code></pre>
 <p>通过Curl创建直播频道</p>
-<pre><code>curl -d '{&quot;isFlv&quot;:true, &quot;isHls&quot;:false, &quot;isVideo&quot;:true, &quot;isImage&quot;:false, &quot;isMotion&quot;:false, &quot;isOnDemand&quot;:false, &quot;isCMAF&quot;:false, &quot;video_time&quot;:&quot;60&quot;, &quot;image_time&quot;:&quot;30&quot;, &quot;hls_time&quot;:&quot;2&quot;, &quot;hls_list_size&quot;:&quot;5&quot;, &quot;outdate&quot;:&quot;2022-12-09&quot;}' -H &quot;Content-Type: application/json&quot; -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
+<pre><code>curl -d 
+'{
+    &quot;isFlv&quot;:true, 
+    &quot;isHls&quot;:false, 
+    &quot;isVideo&quot;:true, 
+    &quot;isImage&quot;:false, 
+    &quot;isMotion&quot;:false, 
+    &quot;isOnDemand&quot;:false, 
+    &quot;isCMAF&quot;:false, 
+    &quot;video_time&quot;:&quot;60&quot;, 
+    &quot;image_time&quot;:&quot;30&quot;, 
+    &quot;hls_time&quot;:&quot;2&quot;, 
+    &quot;hls_list_size&quot;:&quot;5&quot;, 
+    &quot;outdate&quot;:&quot;2022-12-09&quot;
+}' 
+-H &quot;Content-Type: application/json&quot; 
+-X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
 </code></pre>
 <p>通过Thunder Client创建直播频道，创建成功后会获取对应的返回信息</p>
 <p><img alt="metadata-create" src="images/metadata-create.png" /></p>
@@ -804,10 +837,10 @@ http://&lt;LiveVideoPullStreamURL&gt;/98724e64-bcd1-4887-af4a-60be440709aa/flv.h
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": ".", "features": ["tabs", "search.suggest", "search.highlight"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.f8263e09.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": ["tabs", "search.suggest", "search.highlight"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.fcfe8b6d.min.js", "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.4fc53ad4.min.js"></script>
+      <script src="assets/javascripts/bundle.b1047164.min.js"></script>
       
     
   </body>

@@ -97,7 +97,7 @@ Click [**Here**](https://cn-north-1.console.amazonaws.cn/cloudformation/home?reg
 
 ![console-snapshot](./images/console-snapshot.png)
 
-Click Next to configure the deployment options. InstallDemoConsole configures whether to deploy the user demo web interface, default value is false. CNAME configures the CNAMEs associated with CloudFront. ZHY/BJS region users need to use the registered domain name for association. Overseas users do not have such requirement, default value is www.example.cn
+Click Next to configure the deployment options. InstallDemoConsole configures whether to deploy the user demo web interface, default value is false. CNAME configures the CNAMEs associated with CloudFront. ZHY/BJS region users need to use the registered domain name for association otherwise you may not access your distribution normally. Overseas users do not have such requirement, default value is www.example.cn. You need to choose at least two availability zones to create new VPC network for network configuration. Also note the maximum length of stack name is 128 characters, we recommend to use shorter stack name such as: LiveStream.
 
 [**optional**]After the solution is deployed, if you want to distribute video streams via HTTPS to further enhance security, you can follow the steps below to additionally configure your CloudFront and Elastic Load Balancer services
 
@@ -143,13 +143,42 @@ The solution uses the RESTFul API provided by API Gateway to manage video channe
 POST the URL address through tools such as Curl or Postman to create a live channel, where the main content of the request is as follows
 
 ```
-{"isFlv":true, "isHls":true, "isVideo":false, "isImage":true, "isMotion":false, "isOnDemand":false, "isCMAF":false, "video_time":"60", "image_time":"30", "hls_time":"2", "hls_list_size":"5", "outdate":"2022-12-09"}
+{
+    "isFlv":true, 
+    "isHls":true, 
+    "isVideo":false, 
+    "isImage":true, 
+    "isMotion":false, 
+    "isOnDemand":false, 
+    "isCMAF":false, 
+    "video_time":"60", 
+    "image_time":"30", 
+    "hls_time":"2", 
+    "hls_list_size":"5", 
+    "outdate":"2022-12-09"
+}
 ```
 
 create live channel by Curl
 
 ```
-curl -d '{"isFlv":true, "isHls":false, "isVideo":true, "isImage":false, "isMotion":false, "isOnDemand":false, "isCMAF":false, "video_time":"60", "image_time":"30", "hls_time":"2", "hls_list_size":"5", "outdate":"2022-12-09"}' -H "Content-Type: application/json" -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
+curl -d
+'{
+    "isFlv":true, 
+    "isHls":false, 
+    "isVideo":true, 
+    "isImage":false, 
+    "isMotion":false, 
+    "isOnDemand":false, 
+    "isCMAF":false, 
+    "video_time":"60", 
+    "image_time":"30", 
+    "hls_time":"2", 
+    "hls_list_size":"5", 
+    "outdate":"2022-12-09"
+}' 
+-H "Content-Type: application/json" 
+-X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
 ```
 
 Create a live channel through Thunder Client. After the creation is successful, you will get the corresponding return information

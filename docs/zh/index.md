@@ -93,7 +93,7 @@ rtmp://<DNS Name>/stream/<stream key>
 
 ![console-snapshot](./images/console-snapshot.png)
 
-点击下一步进行部署选项配置，其中InstallDemoConsole配置是否部署用户演示的web界面，默认为false，CNAME配置CloudFront所关联的CNAMEs，大陆用户需要使用备案域名进行关联，海外用户无此要求，默认为www.example.cn
+点击下一步进行部署选项配置，其中InstallDemoConsole配置是否部署用户演示的web界面，默认为false，CNAME配置CloudFront所关联的CNAMEs，大陆用户需要使用备案域名进行关联，否则会导致您的域名无法访问，海外用户无此要求，默认为www.example.cn。网络配置部分，您需要最少选择两个可用区以进行VPC网络的创建。最后需要注意栈名称的最大长度为128个字符，我们建议您使用较短的名称进行命名，比如：LiveStream。
 
 [**可选**]在方案部署完毕之后，如果您希望通过HTTPS方式分发视频流以进一步增强安全性，则可以按照下列步骤来额外配置您的CloudFront和Elastic Load Balancer服务
 
@@ -138,13 +138,42 @@ sudo aws iam upload-server-certificate \
 通过Curl或者Postman等工具对该URL地址进行POST操作以创建直播频道，其中request的主体内容如下所示
 
 ```
-{"isFlv":true, "isHls":true, "isVideo":false, "isImage":true, "isMotion":false, "isOnDemand":false, "isCMAF":false, "video_time":"60", "image_time":"30", "hls_time":"2", "hls_list_size":"5", "outdate":"2022-12-09"}
+{
+    "isFlv":true, 
+    "isHls":true, 
+    "isVideo":false, 
+    "isImage":true, 
+    "isMotion":false, 
+    "isOnDemand":false, 
+    "isCMAF":false, 
+    "video_time":"60", 
+    "image_time":"30", 
+    "hls_time":"2", 
+    "hls_list_size":"5", 
+    "outdate":"2022-12-09"
+}
 ```
 
 通过Curl创建直播频道
 
 ```
-curl -d '{"isFlv":true, "isHls":false, "isVideo":true, "isImage":false, "isMotion":false, "isOnDemand":false, "isCMAF":false, "video_time":"60", "image_time":"30", "hls_time":"2", "hls_list_size":"5", "outdate":"2022-12-09"}' -H "Content-Type: application/json" -X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
+curl -d 
+'{
+    "isFlv":true, 
+    "isHls":false, 
+    "isVideo":true, 
+    "isImage":false, 
+    "isMotion":false, 
+    "isOnDemand":false, 
+    "isCMAF":false, 
+    "video_time":"60", 
+    "image_time":"30", 
+    "hls_time":"2", 
+    "hls_list_size":"5", 
+    "outdate":"2022-12-09"
+}' 
+-H "Content-Type: application/json" 
+-X POST https://xxxxx.execute-api.cn-northwest-1.amazonaws.com.cn/Prod/videostream
 ```
 
 通过Thunder Client创建直播频道，创建成功后会获取对应的返回信息

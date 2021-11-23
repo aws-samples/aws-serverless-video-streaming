@@ -14,8 +14,8 @@ Parameters:
     NoEcho: True
   InstallDemoConsole:
     Type: String
-    Default: No
-    Description: Install Web Console For Live Video Demostration
+    Default: False
+    Description: Install Web Console For Live Video Demostration, fill in 'True' (case sensitive) to install.
   CNAME:
     Type: String
     Default: www.example.cn

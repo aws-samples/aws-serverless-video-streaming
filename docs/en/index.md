@@ -10,7 +10,7 @@ SPDX-FileCopyrightText: 2021 Amazon.com， Inc. or its affiliates. All Rights Re
 SPDX-License-Identifier: MIT-0 License
 -->
 
-# Serverless Video Streaming Platform ([Zh](./README.md))
+# Serverless Video Streaming Platform ([Zh](../zh/index.html))
 
 The solution is based on Amazon ECS, API Gateway, DynamoDB and other managed services, to build a one-stop video service platform including video push, transcoding, watermarking, on-demand play and distribution functions, with characteristics of high availability, resource auto-scaling, and easy-to-use. All services involved in solution are deployed through Amazon CloudFormation, with deterministic deployment with Infrastructure As Code. Whole data flows are as shown below:
 

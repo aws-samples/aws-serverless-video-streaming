@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2021 Amazon.com， Inc. or its affiliates. All Rights Re
 SPDX-License-Identifier: MIT-0 License
 -->
 
-# 基于无服务架构的直播和点播方案（[En](./README_en.md))
+# 基于无服务架构的直播和点播方案（[En](./README_en.md)）
 
 该方案基于Amazon ECS，API Gateway，DynamoDB等托管服务，构建了包含视频推送，转码，水印，点播和分发等功能的一站式视频服务平台，具有服务可靠，资源弹性，部署简易等特点，方案涉及的所有服务通过Amazon CloudFormation实现一键部署，其中数据流向如下：
 

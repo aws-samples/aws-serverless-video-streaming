@@ -162,6 +162,9 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: LogDeliveryWrite
+      OwnershipControls: 
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
     Metadata:
       cfn_nag:
         rules_to_suppress:

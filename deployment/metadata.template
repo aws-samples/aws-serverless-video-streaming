@@ -29,7 +29,7 @@ Resources:
         # Bucket: serverless-video-streaming-cn-northwest-1
         # Key: artifacts/metadata.zip
       Handler: streams.handler
-      Runtime: nodejs12.x
+      Runtime: nodejs18.x
       Policies:
       # fixed name for now
       - DynamoDBCrudPolicy:
